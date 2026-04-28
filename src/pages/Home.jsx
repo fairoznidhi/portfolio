@@ -38,38 +38,52 @@ export default function Home() {
       <section className={styles.hero}>
         <div className={styles.heroNoise} />
         <div className={styles.heroInner}>
-          <h1 className={styles.heroName}>{personalInfo.name}</h1>
-          <p className={styles.heroTitle}>
-            {personalInfo.title} <span className={styles.heroAt}>@</span>{" "}
-            {personalInfo.company}
-          </p>
-          <p className={styles.heroBio}>{personalInfo.bio}</p>
-          <div className={styles.heroLinks}>
-            <a
-              href={personalInfo.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.heroLink}
-            >
-              <GithubIcon /> GitHub
-            </a>
-            <a
-              href={personalInfo.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.heroLink}
-            >
-              <LinkedinIcon /> LinkedIn
-            </a>
-            <a
-              href={`mailto:${personalInfo.email}`}
-              className={styles.heroLink}
-            >
-              <MailIcon /> Email
-            </a>
-            <a href="/resume.pdf" download="Tasfi_Fairoz_Nidhi_Resume.pdf" className={styles.heroCta}>
-              Download CV ↓
-            </a>
+          <div className={styles.heroFlex}>
+            <div className={styles.heroContent}>
+              <h1 className={styles.heroName}>{personalInfo.name}</h1>
+              <p className={styles.heroTitle}>
+                {personalInfo.title} <span className={styles.heroAt}>@</span>{" "}
+                {personalInfo.company}
+              </p>
+              <div className={styles.heroLinks}>
+                <a
+                  href={personalInfo.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.heroLink}
+                >
+                  <GithubIcon /> GitHub
+                </a>
+                <a
+                  href={personalInfo.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.heroLink}
+                >
+                  <LinkedinIcon /> LinkedIn
+                </a>
+                <a
+                  href={`mailto:${personalInfo.email}`}
+                  className={styles.heroLink}
+                >
+                  <MailIcon /> Email
+                </a>
+                <a
+                  href="/resume.pdf"
+                  download="Tasfi_Fairoz_Nidhi_Resume.pdf"
+                  className={styles.heroCta}
+                >
+                  Download CV ↓
+                </a>
+              </div>
+            </div>
+            <div className={styles.heroImageWrapper}>
+              <img
+                src="/images/profile2.jpg"
+                alt={personalInfo.name}
+                className={styles.heroImage}
+              />
+            </div>
           </div>
           <div className={styles.heroEdu}>
             <span className={styles.heroEduLabel}>Education</span>
@@ -100,7 +114,10 @@ export default function Home() {
                 className={`${styles.reveal} ${styles.timelineItem}`}
                 style={{ animationDelay: `${i * 0.1}s` }}
               >
-                <div className={styles.timelineDot} />
+                <div
+                  className={`${styles.timelineDot} ${i === 0 ? styles.timelineDotActive : ""}`}
+                />
+
                 <div className={styles.timelineContent}>
                   <div className={styles.timelineMeta}>
                     <span className={styles.timelinePeriod}>{exp.period}</span>
@@ -244,18 +261,50 @@ export default function Home() {
               data-reveal
               className={`${styles.reveal} ${styles.pubCard}`}
             >
+              <div className={styles.pubMeta}>
+                <span className={styles.pubType}>{pub.type}</span>
+                <span className={styles.pubDate}>{pub.date}</span>
+              </div>
               <div className={styles.pubVenue}>{pub.venue}</div>
-              <h3 className={styles.pubTitle}>{pub.title}</h3>
-              {pub.link && pub.link !== "#" && (
-                <a
-                  href={pub.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.pubLink}
-                >
-                  Read paper ↗
-                </a>
+              {pub.authors && (
+                <div className={styles.pubAuthors}>{pub.authors}</div>
               )}
+              <h3 className={styles.pubTitle}>{pub.title}</h3>
+
+              {pub.abstract && (
+                <p className={styles.pubAbstract}>{pub.abstract}</p>
+              )}
+              <div className={styles.pubActions}>
+                <div className={styles.pubLinks}>
+                  {pub.link && pub.link !== "#" && (
+                    <a
+                      href={pub.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.pubLink}
+                    >
+                      Read paper ↗
+                    </a>
+                  )}
+                  {pub.link && pub.pdf && (
+                    <span className={styles.pubSeparator}>|</span>
+                  )}
+                  {pub.pdf && pub.pdf !== "#" && (
+                    <a
+                      href={pub.pdf}
+                      download
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.pubLink}
+                    >
+                      Download PDF ↓
+                    </a>
+                  )}
+                </div>
+                {pub.doi && (
+                  <span className={styles.pubDoi}>DOI: {pub.doi}</span>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -264,32 +313,34 @@ export default function Home() {
       {/* BLOG PREVIEW */}
       <section className={styles.section}>
         <div className={styles.sectionInner}>
-          <div data-reveal className={styles.reveal}>
-            <SectionLabel>Writing</SectionLabel>
-            <h2 className={styles.sectionTitle}>From the Blog</h2>
-          </div>
-          <div className={styles.blogGrid}>
-            {blogs.map((b, i) => (
-              <Link
-                key={b.id}
-                to={`/blog/${b.id}`}
-                data-reveal
-                className={`${styles.reveal} ${styles.blogCard}`}
-                style={{ animationDelay: `${i * 0.1}s` }}
-              >
-                <div className={styles.blogMeta}>
-                  {b.tags.slice(0, 2).map((t) => (
-                    <span key={t} className={styles.blogTag}>
-                      {t}
-                    </span>
-                  ))}
-                  <span className={styles.blogDate}>{b.readTime}</span>
-                </div>
-                <h3 className={styles.blogTitle}>{b.title}</h3>
-                <p className={styles.blogSubtitle}>{b.subtitle}</p>
-                <span className={styles.blogArrow}>Read more →</span>
-              </Link>
-            ))}
+          <div className={styles.blogHighlightContainer}>
+            <div data-reveal className={styles.reveal}>
+              <SectionLabel>Writing</SectionLabel>
+              <h2 className={styles.sectionTitle}>From the Blog</h2>
+            </div>
+            <div className={styles.blogGrid}>
+              {blogs.map((b, i) => (
+                <Link
+                  key={b.id}
+                  to={`/blog/${b.id}`}
+                  data-reveal
+                  className={`${styles.reveal} ${styles.blogCard}`}
+                  style={{ animationDelay: `${i * 0.1}s` }}
+                >
+                  <div className={styles.blogMeta}>
+                    {b.tags.slice(0, 2).map((t) => (
+                      <span key={t} className={styles.blogTag}>
+                        {t}
+                      </span>
+                    ))}
+                    <span className={styles.blogDate}>{b.readTime}</span>
+                  </div>
+                  <h3 className={styles.blogTitle}>{b.title}</h3>
+                  <p className={styles.blogSubtitle}>{b.subtitle}</p>
+                  <span className={styles.blogArrow}>Read more →</span>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </section>

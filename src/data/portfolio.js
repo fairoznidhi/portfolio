@@ -6,7 +6,7 @@ export const personalInfo = {
   email: "fairoz1697@gmail.com",
   github: "https://github.com/fairoznidhi",
   linkedin: "https://linkedin.com/in/tasfifairoznidhi",
-  codeforces: "https://codeforces.com/profile/nidhi",
+  codeforces: "https://codeforces.com/profile/_nidhi_",
   codechef: "https://www.codechef.com/users/fairoznidhi",
   atcoder: "https://atcoder.jp/users/fairoz_nidhi",
   location: "Dhaka, Bangladesh",
@@ -23,7 +23,7 @@ export const experiences = [
     title: "Software Engineer L-1",
     company: "Vivasoft Limited",
     location: "Dhaka, Bangladesh",
-    period: "2024 – Present",
+    period: "July 2025 – Present",
     type: "Full-time",
     description:
       "Built and maintained web applications using Next.js, React, and TypeScript. Created reusable components to improve development efficiency. Collaborated with the team through Git and code reviews. Optimized UI components for better performance and responsiveness.",
@@ -38,7 +38,7 @@ export const experiences = [
     title: "Associate Software Engineer",
     company: "Vivasoft Limited",
     location: "Rajshahi, Bangladesh",
-    period: "2023 – 2024",
+    period: "November 2024 - June 2025",
     type: "Internship (Part-time)",
     description:
       "Learned front-end development with React, Next.js, and Tailwind CSS. Built interactive pages with reusable components. Improved code quality by refactoring older components. Collaborated using Git and participated in code reviews.",
@@ -152,30 +152,30 @@ export const skills = {
 export const competitive = [
   {
     platform: "Codeforces",
-    handle: "nidhi",
+    handle: "_nidhi_",
     rating: 1430,
     rank: "Specialist",
-    solved: 484,
-    url: "https://codeforces.com/profile/nidhi",
-    color: "#1890ff",
+    solved: 485,
+    url: personalInfo.codeforces,
+    color: "#00b5a5",
   },
   {
     platform: "CodeChef",
     handle: "fairoznidhi",
     rating: 1359,
-    rank: "3 Star",
+    rank: "1★",
     solved: 16,
-    url: "https://www.codechef.com/users/fairoznidhi",
-    color: "#f59e0b",
+    url: personalInfo.codechef,
+    color: "#666666",
   },
   {
     platform: "AtCoder",
     handle: "fairoz_nidhi",
     rating: 126,
-    rank: "Gray",
+    rank: "11 Kyu",
     solved: 17,
-    url: "https://atcoder.jp/users/fairoz_nidhi",
-    color: "#8b5cf6",
+    url: personalInfo.atcoder,
+    color: "#7f7f7f",
   },
 ];
 
@@ -196,8 +196,17 @@ export const publications = [
     title:
       "Triple Attention MobileNetV3: Harnessing Integrated Attention and Transfer Learning for Next-Generation Skin Lesion Detection",
     venue:
-      "IEEE Conference on Computing Applications and Systems (COMPAS 2024)",
-    link: "#",
+      "2024 IEEE International Conference on Computing, Applications and Systems (COMPAS)",
+    type: "Conference Paper",
+    date: "September 2024",
+    authors:
+      "Tasfi Fairoz Nidhi, Anwar Hossain Efat, S. M. Mahedy Hasan, Md. Shahid Uz Zaman, Abdun Nur Wasit",
+    link: "https://ieeexplore.ieee.org/document/10796988",
+    doi: "10.1109/COMPAS60761.2024.10796988",
+    pdf: "/publications/Triple_Attention_MobileNetV3_Harnessing_Integrated_Attention_and_Transfer_Learning_for_Next-Generation_Skin_Lesion_Detection.pdf",
+
+    abstract:
+      "Detecting skin lesions, especially cancerous melanoma, early is vital for effective treatment. However, traditional detection methods are costly, time-consuming, and involve numerous tests, making early detection challenging. This study introduces a new approach called Triple Attention MobileNetV3 (TAMN), which utilizes a novel multi-stream attention-infused Convolutional Neural Network (CNN) architecture based on Transfer Learning principles. TAMN aims to improve skin lesion recognition, offering a potentially more efficient solution. Data augmentation and careful dataset splitting addressed class imbalance, preventing biased modeling. This TAMN architecture integrated an Attention Module comprising Channel Attention, Squeeze and Excitation Attention, and Soft Attention mechanisms to emphasize crucial features and regions relevant to accurate classification. Gradient Class Activation Map (Grad-CAM) visualization identified areas the model focused on, improving interpretability and explainability. The proposed model achieved 99.56% accuracy on the PAD-UFES-20 dataset, outperforming the direct use of any pre-trained models. The attention modules significantly boosted metrics like precision, recall, F1-score and specificity compared to baselines, showcasing their efficacy in enhancing skin lesion classification for early cancer detection. The approach demonstrates the potential of attention-based deep learning models for accurate and interpretable skin lesion analysis, paving the way for improved early screening and diagnosis.",
   },
 ];
 

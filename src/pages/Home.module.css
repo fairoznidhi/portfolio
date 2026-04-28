@@ -103,15 +103,47 @@
   }
 }
 
+.heroFlex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 60px;
+  margin-bottom: 60px;
+}
+
+.heroContent {
+  flex: 1;
+}
+
+.heroImageWrapper {
+  flex-shrink: 0;
+}
+
+.heroImage {
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  transition: transform 0.4s ease;
+}
+
+
+.heroImage:hover {
+  transform: scale(1.03) rotate(1deg);
+}
+
 .heroName {
   font-family: var(--font-serif);
-  font-size: clamp(3rem, 8vw, 6rem);
+  font-size: clamp(3rem, 7vw, 5.5rem);
   font-weight: 400;
   line-height: 1.05;
   letter-spacing: -0.02em;
   color: var(--text);
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
+
 
 .heroTitle {
   font-size: 1.1rem;
@@ -258,6 +290,18 @@
   margin-bottom: 56px;
 }
 
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(200, 169, 110, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(200, 169, 110, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(200, 169, 110, 0);
+  }
+}
+
 .timelineDot {
   position: absolute;
   left: -28px;
@@ -268,6 +312,15 @@
   background: var(--accent);
   border: 2px solid var(--bg);
   box-shadow: 0 0 0 3px var(--border);
+}
+
+.timelineDotActive {
+  width: 16px;
+  height: 16px;
+  left: -30px;
+  top: 4px;
+  animation: pulse 2s infinite;
+  background: var(--accent);
 }
 
 .timelineMeta {
@@ -609,6 +662,30 @@
   padding: 32px;
 }
 
+.pubMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.pubType {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: var(--bg3);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.pubDate {
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  color: var(--text3);
+}
+
 .pubVenue {
   font-size: 0.78rem;
   font-family: var(--font-mono);
@@ -618,13 +695,21 @@
   text-transform: uppercase;
 }
 
+.pubAuthors {
+  font-size: 0.85rem;
+  color: var(--text3);
+  font-style: italic;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
 .pubTitle {
   font-family: var(--font-serif);
   font-size: 1.3rem;
   font-weight: 400;
   color: var(--text);
   line-height: 1.5;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 
 .pubLink {
@@ -637,8 +722,61 @@
   opacity: 0.7;
 }
 
+.pubAbstract {
+  font-size: 0.85rem;
+  color: var(--text2);
+  line-height: 1.7;
+  margin-bottom: 24px;
+  background: var(--bg3);
+  padding: 18px 20px;
+  border-radius: 8px;
+  border-left: 3px solid var(--accent);
+  text-align: justify;
+}
+
+.pubActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.pubLinks {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pubSeparator {
+  color: var(--border);
+  font-size: 0.8rem;
+  user-select: none;
+}
+
+.pubDoi {
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  color: var(--text3);
+}
+
 /* BLOG */
+.blogHighlightContainer {
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 60px;
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+  .blogHighlightContainer {
+    padding: 32px 20px;
+  }
+}
+
 .blogGrid {
+
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 16px;
@@ -811,9 +949,32 @@
 }
 
 /* RESPONSIVE */
+@media (max-width: 900px) {
+  .heroFlex {
+    flex-direction: column-reverse;
+    text-align: center;
+    gap: 48px;
+  }
+
+  .heroImage {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+  }
+
+
+  .heroLinks {
+    justify-content: center;
+  }
+}
+
 @media (max-width: 768px) {
   .heroName {
-    font-size: 3rem;
+    font-size: clamp(2.5rem, 10vw, 4rem);
+  }
+  .blogHighlightContainer {
+    padding: 40px 20px;
+    border-radius: 16px;
   }
   .cpGrid {
     grid-template-columns: 1fr;
@@ -841,4 +1002,9 @@
   .heroInner {
     padding: 0 20px;
   }
+  .blogHighlightContainer {
+    padding: 32px 16px;
+    border-radius: 12px;
+  }
 }
+
