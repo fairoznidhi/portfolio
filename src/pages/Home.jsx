@@ -67,7 +67,7 @@ export default function Home() {
             >
               <MailIcon /> Email
             </a>
-            <a href="/resume.pdf" download className={styles.heroCta}>
+            <a href="/resume.pdf" download="Tasfi_Fairoz_Nidhi_Resume.pdf" className={styles.heroCta}>
               Download CV ↓
             </a>
           </div>

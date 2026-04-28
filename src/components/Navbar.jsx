@@ -42,7 +42,7 @@ export default function Navbar() {
           ))}
           <a
             href="/resume.pdf"
-            download
+            download="Tasfi_Fairoz_Nidhi_Resume.pdf"
             className={styles.resumeBtn}
           >
             Resume ↓
@@ -65,7 +65,7 @@ export default function Navbar() {
           {navLinks.map(l => (
             <Link key={l.to} to={l.to} className={styles.mobileLink}>{l.label}</Link>
           ))}
-          <a href="/resume.pdf" download className={styles.mobileResume}>Download Resume</a>
+          <a href="/resume.pdf" download="Tasfi_Fairoz_Nidhi_Resume.pdf" className={styles.mobileResume}>Download Resume</a>
         </div>
       )}
     </nav>
