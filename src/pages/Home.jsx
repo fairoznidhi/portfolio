@@ -271,9 +271,9 @@ export default function Home() {
               )}
               <h3 className={styles.pubTitle}>{pub.title}</h3>
 
-              {pub.abstract && (
+              {/* {pub.abstract && (
                 <p className={styles.pubAbstract}>{pub.abstract}</p>
-              )}
+              )} */}
               <div className={styles.pubActions}>
                 <div className={styles.pubLinks}>
                   {pub.link && pub.link !== "#" && (
