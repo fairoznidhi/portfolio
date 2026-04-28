@@ -129,7 +129,6 @@
   transition: transform 0.4s ease;
 }
 
-
 .heroImage:hover {
   transform: scale(1.03) rotate(1deg);
 }
@@ -143,7 +142,6 @@
   color: var(--text);
   margin-bottom: 24px;
 }
-
 
 .heroTitle {
   font-size: 1.1rem;
@@ -758,6 +756,17 @@
   font-size: 0.75rem;
   font-family: var(--font-mono);
   color: var(--text3);
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: all;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: transparent;
+}
+
+.pubDoi:hover {
+  color: var(--accent);
+  background: var(--bg3);
 }
 
 /* BLOG */
@@ -776,7 +785,6 @@
 }
 
 .blogGrid {
-
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 16px;
@@ -962,7 +970,6 @@
     border-radius: 50%;
   }
 
-
   .heroLinks {
     justify-content: center;
   }
@@ -1007,4 +1014,3 @@
     border-radius: 12px;
   }
 }
-

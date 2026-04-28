@@ -302,7 +302,24 @@ export default function Home() {
                   )}
                 </div>
                 {pub.doi && (
-                  <span className={styles.pubDoi}>DOI: {pub.doi}</span>
+                  <span
+                    className={styles.pubDoi}
+                    onClick={() => {
+                      navigator.clipboard.writeText(pub.doi);
+                      const el = document.getElementById(`doi-${i}`);
+                      if (el) {
+                        el.innerText = "✓ Copied!";
+                        setTimeout(
+                          () => (el.innerText = `DOI: ${pub.doi}`),
+                          2000,
+                        );
+                      }
+                    }}
+                    id={`doi-${i}`}
+                    title="Click to copy DOI"
+                  >
+                    DOI: {pub.doi}
+                  </span>
                 )}
               </div>
             </div>
@@ -394,7 +411,7 @@ export default function Home() {
       {/* FOOTER */}
       <footer className={styles.footer}>
         <div className={styles.footerInner}>
-          <span>© 2025 Tasfi Fairoz Nidhi</span>
+          <span>© 2026 Tasfi Fairoz Nidhi</span>
           <div className={styles.footerLinks}>
             <a
               href={personalInfo.github}
