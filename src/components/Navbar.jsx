@@ -24,11 +24,20 @@ export default function Navbar() {
   return (
     <nav className={`${styles.nav} ${scrolled ? styles.scrolled : ""}`}>
       <div className={styles.inner}>
-        <Link to="/" className={styles.logo}>
+        <Link
+          to="/"
+          className={styles.logo}
+          onClick={() => {
+            if (location.pathname === "/") {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          }}
+        >
           <span className={styles.logoAccent}>TF</span>
           <span className={styles.logoDot}>·</span>
           <span>Nidhi</span>
         </Link>
+
 
         <div className={styles.links}>
           {navLinks.map((l) => (
@@ -36,10 +45,16 @@ export default function Navbar() {
               key={l.to}
               to={l.to}
               className={`${styles.link} ${location.pathname === l.to ? styles.active : ""}`}
+              onClick={() => {
+                if (location.pathname === l.to) {
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }
+              }}
             >
               {l.label}
             </Link>
           ))}
+
           <a
             href="/resume.pdf"
             download="Tasfi_Fairoz_Nidhi_Resume.pdf"
