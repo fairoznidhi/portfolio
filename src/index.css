@@ -4,6 +4,10 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* Preflight is disabled in tailwind.config.js, which also removes Tailwind's
+   border reset. Restore just that bit so `border-*` utilities render. */
+*, *::before, *::after { border-width: 0; border-style: solid; border-color: currentColor; }
+
 :root {
   /* ===== THEME 04 — VIOLET GLOSS (LIVE) ===== */
   /* Core Legacy Hex Tokens (CSS Modules) */
@@ -154,6 +158,7 @@ h1, h2, h3, h4 {
   margin-left: 256px; /* fixed sidebar width */
   display: flex;
   flex-direction: column;
+  overflow-x: clip; /* contains the footer's full-bleed right extension */
 }
 
 .content {

@@ -1,22 +1,44 @@
 import { education, experiences } from "../../data/portfolio";
-import styles from "./BackgroundSection.module.css";
 
 function TimelineColumn({ label, items }) {
   return (
-    <div className={styles.column}>
-      <p className={styles.colLabel}>{label}</p>
-      <ol className={styles.timeline}>
+    <div>
+      <p className="mb-8 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text3)]">
+        {label}
+      </p>
+      <ol className="relative list-none pl-7 before:absolute before:bottom-[6px] before:left-[5px] before:top-[6px] before:w-[1.5px] before:bg-border before:content-['']">
         {items.map((it, i) => (
-          <li key={i} className={styles.entry}>
-            <span className={styles.dot} aria-hidden="true" />
-            <span className={styles.period}>{it.period}</span>
-            <h3 className={styles.entryTitle}>{it.title}</h3>
-            <p className={styles.entrySub}>{it.subtitle}</p>
-            {it.body && <p className={styles.entryBody}>{it.body}</p>}
+          <li
+            key={i}
+            className="relative pb-11 last:pb-0"
+          >
+            <span
+              aria-hidden="true"
+              className="absolute -left-7 top-1 h-3 w-3 rounded-full bg-[var(--accent)] shadow-[0_0_0_4px_var(--bg)]"
+            />
+            <span className="mb-3 inline-block rounded-full bg-[color-mix(in_srgb,var(--accent)_12%,transparent)] px-[10px] py-[3px] text-[0.8rem] font-semibold text-[var(--accent)]">
+              {it.period}
+            </span>
+            <h3 className="mb-1 text-[1.15rem] font-bold tracking-[-0.01em] text-[var(--text)]">
+              {it.title}
+            </h3>
+            <p className="mb-[14px] text-[0.92rem] text-[var(--text2)]">
+              {it.subtitle}
+            </p>
+            {it.body && (
+              <p className="max-w-[46ch] text-[0.9rem] leading-[1.65] text-[var(--text2)]">
+                {it.body}
+              </p>
+            )}
             {it.highlights?.length > 0 && (
-              <ul className={styles.bullets}>
+              <ul className="mt-3 flex list-none flex-col gap-[7px]">
                 {it.highlights.map((h, j) => (
-                  <li key={j}>{h}</li>
+                  <li
+                    key={j}
+                    className="relative pl-[18px] text-[0.88rem] leading-[1.5] text-[var(--text2)] before:absolute before:left-[2px] before:top-[0.6em] before:h-[5px] before:w-[5px] before:rounded-full before:bg-[var(--text3)] before:content-['']"
+                  >
+                    {h}
+                  </li>
                 ))}
               </ul>
             )}
@@ -45,8 +67,8 @@ export default function BackgroundSection() {
   }));
 
   return (
-    <section className={styles.section} id="background">
-      <div className={styles.grid}>
+    <section id="background" className="pb-24">
+      <div className="grid grid-cols-2 gap-[72px] max-[900px]:grid-cols-1 max-[900px]:gap-12">
         <TimelineColumn label="Education" items={eduItems} />
         <TimelineColumn label="Experience" items={expItems} />
       </div>

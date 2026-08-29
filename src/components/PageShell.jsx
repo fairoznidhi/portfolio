@@ -1,15 +1,10 @@
-import { useReveal } from "../hooks/useReveal";
-import homeStyles from "../pages/Home.module.css";
-
 /**
- * Common page wrapper: reveal-on-scroll ref, top padding, centered inner column,
- * and an optional label / title / subtitle header.
+ * Common page wrapper: top padding + centered inner column left-aligned to the
+ * sidebar edge, plus an optional title / subtitle header.
  */
 export default function PageShell({ title, subtitle, children }) {
-  const ref = useReveal(homeStyles.visible);
-
   return (
-    <div ref={ref} className={homeStyles.page}>
+    <div className="pt-10">
       <div className="mr-auto max-w-[1184px] px-8 max-[480px]:px-5">
         {(title || subtitle) && (
           <header className="mb-10 max-[480px]:mb-8">

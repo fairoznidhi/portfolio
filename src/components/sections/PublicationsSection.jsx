@@ -1,44 +1,58 @@
 import { ArrowUpRight, Download } from "lucide-react";
 import { publications } from "../../data/portfolio";
-import styles from "../../pages/Home.module.css";
 
 export default function PublicationsSection() {
   return (
     <div id="publications">
-      <div data-reveal className={styles.reveal}>
-        <p className={styles.sectionLabel}>Research</p>
-        <h2 className={styles.sectionTitle}>Publications</h2>
+      <div>
+        <p className="mb-3 text-xs uppercase tracking-[0.12em] text-[var(--accent)]">
+          Research
+        </p>
+        <h2 className="mb-14 text-[clamp(2rem,4vw,3rem)] font-normal tracking-[-0.02em] text-[var(--text)]">
+          Publications
+        </h2>
       </div>
-      <div className={styles.pubList}>
+      <div className="flex flex-col gap-5">
         {publications.map((pub, i) => (
           <div
             key={i}
-            data-reveal
-            className={`${styles.reveal} ${styles.pubCard}`}
+            className="rounded-[10px] border border-border bg-[var(--bg2)] p-8"
           >
-            <div className={styles.pubMeta}>
-              <span className={styles.pubType}>{pub.type}</span>
-              <span className={styles.pubDate}>{pub.date}</span>
+            <div className="mb-3 flex items-center justify-between">
+              <span className="rounded bg-[var(--bg3)] px-2 py-[2px] text-[0.7rem] uppercase tracking-[0.1em] text-[var(--text3)]">
+                {pub.type}
+              </span>
+              <span className="text-[0.75rem] text-[var(--text3)]">
+                {pub.date}
+              </span>
             </div>
-            <div className={styles.pubVenue}>{pub.venue}</div>
+            <div className="mb-3 text-[0.78rem] uppercase tracking-[0.06em] text-[var(--accent)]">
+              {pub.venue}
+            </div>
             {pub.authors && (
-              <div className={styles.pubAuthors}>{pub.authors}</div>
+              <div className="mb-4 text-[0.85rem] italic leading-[1.4] text-[var(--text3)]">
+                {pub.authors}
+              </div>
             )}
-            <h3 className={styles.pubTitle}>{pub.title}</h3>
-            <div className={styles.pubActions}>
-              <div className={styles.pubLinks}>
+            <h3 className="mb-6 text-[1.3rem] font-normal leading-[1.5] text-[var(--text)]">
+              {pub.title}
+            </h3>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
                 {pub.link && pub.link !== "#" && (
                   <a
                     href={pub.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={styles.pubLink}
+                    className="text-[0.85rem] text-[var(--accent)] transition-opacity hover:opacity-70"
                   >
                     Read paper <ArrowUpRight size={13} strokeWidth={2} />
                   </a>
                 )}
                 {pub.link && pub.pdf && (
-                  <span className={styles.pubSeparator}>|</span>
+                  <span className="select-none text-[0.8rem] text-[var(--border)]">
+                    |
+                  </span>
                 )}
                 {pub.pdf && pub.pdf !== "#" && (
                   <a
@@ -46,7 +60,7 @@ export default function PublicationsSection() {
                     download
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={styles.pubLink}
+                    className="text-[0.85rem] text-[var(--accent)] transition-opacity hover:opacity-70"
                   >
                     Download PDF <Download size={13} strokeWidth={2} />
                   </a>
@@ -54,7 +68,7 @@ export default function PublicationsSection() {
               </div>
               {pub.doi && (
                 <span
-                  className={styles.pubDoi}
+                  className="cursor-pointer select-all rounded bg-transparent px-2 py-1 text-[0.75rem] text-[var(--text3)] transition-all hover:bg-[var(--bg3)] hover:text-[var(--accent)]"
                   onClick={() => {
                     navigator.clipboard.writeText(pub.doi);
                     const el = document.getElementById(`doi-${i}`);
