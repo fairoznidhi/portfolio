@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { ArrowLeft, ArrowUpRight } from 'lucide-react';
 import { projects } from '../data/portfolio';
 import styles from './Projects.module.css';
 
@@ -7,7 +8,9 @@ export default function Projects() {
     <div className={styles.page}>
       <div className={styles.inner}>
         <div className={styles.header}>
-          <Link to="/" className={styles.back}>← Back</Link>
+          <Link to="/" className={styles.back}>
+            <ArrowLeft size={13} strokeWidth={2} /> Back
+          </Link>
           <p className={styles.label}>Work</p>
           <h1 className={styles.title}>All Projects</h1>
           <p className={styles.subtitle}>A collection of things I've built — from ML models to full-stack web apps.</p>
@@ -24,12 +27,12 @@ export default function Projects() {
                 <div className={styles.actions}>
                   {proj.github && (
                     <a href={proj.github} target="_blank" rel="noopener noreferrer" className={styles.action}>
-                      GitHub ↗
+                      GitHub <ArrowUpRight size={13} strokeWidth={2} />
                     </a>
                   )}
                   {proj.live && (
                     <a href={proj.live} target="_blank" rel="noopener noreferrer" className={styles.action}>
-                      Live ↗
+                      Live <ArrowUpRight size={13} strokeWidth={2} />
                     </a>
                   )}
                 </div>

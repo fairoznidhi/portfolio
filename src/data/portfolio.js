@@ -10,6 +10,7 @@ export const personalInfo = {
   codechef: "https://www.codechef.com/users/fairoznidhi",
   atcoder: "https://atcoder.jp/users/fairoz_nidhi",
   location: "Dhaka, Bangladesh",
+  hobbies: "Competitive programming · Reading · Travel",
   education: {
     degree: "B.Sc.(Engg.) in Computer Science and Engineering",
     university: "Rajshahi University of Engineering and Technology",
@@ -17,6 +18,30 @@ export const personalInfo = {
     cgpa: "3.84",
   },
 };
+
+export const education = [
+  {
+    degree: "B.Sc. (Engg.) in Computer Science & Engineering",
+    school: "Rajshahi University of Engineering & Technology",
+    period: "Jan 2020 – Jun 2025",
+    detail: "CGPA: 3.84 / 4.00",
+    highlights: [],
+  },
+  {
+    degree: "Higher Secondary Certificate (HSC)",
+    school: "Ideal School and College, Motijheel, Dhaka",
+    period: "Jul 2017 – May 2019",
+    detail: "GPA: 5.00 / 5.00",
+    highlights: ["General Scholarship, Dhaka Education Board"],
+  },
+  {
+    degree: "Secondary School Certificate (SSC)",
+    school: "Ideal School and College, Motijheel, Dhaka",
+    period: "Jan 2015 – Jul 2017",
+    detail: "GPA: 5.00 / 5.00",
+    highlights: [],
+  },
+];
 
 export const experiences = [
   {

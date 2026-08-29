@@ -1,5 +1,9 @@
 .page {
-  min-height: 100vh;
+  padding-top: 24px;
+}
+
+.page > .section:first-child {
+  border-top: none;
 }
 
 /* REVEAL ANIMATION */
@@ -226,6 +230,14 @@
 }
 .accent {
   color: var(--accent) !important;
+}
+
+/* ABOUT */
+.aboutText {
+  max-width: 640px;
+  font-size: 1.15rem;
+  color: var(--text2);
+  line-height: 1.9;
 }
 
 /* SECTIONS */
@@ -930,7 +942,8 @@
 /* FOOTER */
 .footer {
   border-top: 1px solid var(--border);
-  padding: 32px 0;
+  background: var(--bg2);
+  padding: 40px 0;
 }
 
 .footerInner {

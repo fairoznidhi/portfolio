@@ -1,11 +1,23 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { Sun, Moon } from "lucide-react";
+import { useTheme } from "../hooks/useTheme";
 import styles from "./Navbar.module.css";
+
+const navLinks = [
+  { to: "/", label: "About" },
+  { to: "/experience", label: "Experience" },
+  { to: "/publications", label: "Publications" },
+  { to: "/projects", label: "Projects" },
+  { to: "/blog", label: "Blogs" },
+  { to: "/achievements", label: "Achievements" },
+];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
+  const { theme, toggle } = useTheme();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -15,54 +27,41 @@ export default function Navbar() {
 
   useEffect(() => setMenuOpen(false), [location]);
 
-  const navLinks = [
-    { to: "/", label: "Home" },
-    { to: "/projects", label: "Projects" },
-    { to: "/blog", label: "Blog" },
-  ];
+  const isActive = (to) =>
+    to === "/" ? location.pathname === "/" : location.pathname.startsWith(to);
 
   return (
     <nav className={`${styles.nav} ${scrolled ? styles.scrolled : ""}`}>
       <div className={styles.inner}>
-        <Link
-          to="/"
-          className={styles.logo}
-          onClick={() => {
-            if (location.pathname === "/") {
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }
-          }}
-        >
-          <span className={styles.logoAccent}>TF</span>
-          <span className={styles.logoDot}>·</span>
-          <span>Nidhi</span>
-        </Link>
-
-
-        <div className={styles.links}>
+        <div className={styles.segments}>
           {navLinks.map((l) => (
             <Link
               key={l.to}
               to={l.to}
-              className={`${styles.link} ${location.pathname === l.to ? styles.active : ""}`}
+              className={`${styles.segment} ${isActive(l.to) ? styles.active : ""}`}
               onClick={() => {
                 if (location.pathname === l.to) {
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }
               }}
             >
-              {l.label}
+              <span>{l.label}</span>
             </Link>
           ))}
-
-          <a
-            href="/resume.pdf"
-            download="Tasfi_Fairoz_Nidhi_Resume.pdf"
-            className={styles.resumeBtn}
-          >
-            Resume ↓
-          </a>
         </div>
+
+        <button
+          className={`${styles.themeToggle} ${theme === "dark" ? styles.themeOn : ""}`}
+          onClick={toggle}
+          role="switch"
+          aria-checked={theme === "dark"}
+          aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+          title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+        >
+          <Sun className={styles.themeIconSun} size={13} strokeWidth={2} aria-hidden="true" />
+          <Moon className={styles.themeIconMoon} size={13} strokeWidth={2} aria-hidden="true" />
+          <span className={styles.themeKnob} aria-hidden="true" />
+        </button>
 
         <button
           className={styles.hamburger}
@@ -82,13 +81,6 @@ export default function Navbar() {
               {l.label}
             </Link>
           ))}
-          <a
-            href="/resume.pdf"
-            download="Tasfi_Fairoz_Nidhi_Resume.pdf"
-            className={styles.mobileResume}
-          >
-            Download Resume
-          </a>
         </div>
       )}
     </nav>

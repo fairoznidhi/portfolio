@@ -1,4 +1,5 @@
 import { useParams, Link, Navigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { blogs } from '../data/blogs';
 import styles from './BlogPost.module.css';
@@ -12,7 +13,9 @@ export default function BlogPost() {
   return (
     <div className={styles.page}>
       <div className={styles.inner}>
-        <Link to="/blog" className={styles.back}>← All posts</Link>
+        <Link to="/blog" className={styles.back}>
+          <ArrowLeft size={13} strokeWidth={2} /> All posts
+        </Link>
 
         <header className={styles.header}>
           <div className={styles.meta}>
@@ -45,7 +48,9 @@ export default function BlogPost() {
         </article>
 
         <div className={styles.footer}>
-          <Link to="/blog" className={styles.backLink}>← Back to all posts</Link>
+          <Link to="/blog" className={styles.backLink}>
+            <ArrowLeft size={13} strokeWidth={2} /> Back to all posts
+          </Link>
         </div>
       </div>
     </div>

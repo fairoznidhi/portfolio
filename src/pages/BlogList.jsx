@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { ArrowLeft, ArrowUpRight } from 'lucide-react';
 import { blogs } from '../data/blogs';
 import styles from './Blog.module.css';
 
@@ -7,7 +8,9 @@ export default function BlogList() {
     <div className={styles.page}>
       <div className={styles.inner}>
         <div className={styles.header}>
-          <Link to="/" className={styles.back}>← Back</Link>
+          <Link to="/" className={styles.back}>
+            <ArrowLeft size={13} strokeWidth={2} /> Back
+          </Link>
           <p className={styles.label}>Writing</p>
           <h1 className={styles.title}>Blog</h1>
           <p className={styles.subtitle}>Notes on networking, systems, and software engineering.</p>
@@ -25,7 +28,7 @@ export default function BlogList() {
               <div className={styles.itemTags}>
                 {b.tags.map(t => <span key={t} className={styles.itemTag}>{t}</span>)}
               </div>
-              <span className={styles.itemArrow}>↗</span>
+              <ArrowUpRight className={styles.itemArrow} size={16} strokeWidth={2} />
             </Link>
           ))}
         </div>
