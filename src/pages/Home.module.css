@@ -1,9 +1,10 @@
 .page {
-  padding-top: 24px;
+  padding-top: 40px;
 }
 
 .page > .section:first-child {
   border-top: none;
+  padding-top: 0;
 }
 
 /* REVEAL ANIMATION */
@@ -665,6 +666,12 @@
 }
 
 /* PUBLICATIONS */
+.pubList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 .pubCard {
   background: var(--bg2);
   border: 1px solid var(--border);

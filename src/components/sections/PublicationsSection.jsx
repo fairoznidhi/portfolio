@@ -4,12 +4,12 @@ import styles from "../../pages/Home.module.css";
 
 export default function PublicationsSection() {
   return (
-    <section className={styles.section} id="publications">
-      <div className={styles.sectionInner}>
-        <div data-reveal className={styles.reveal}>
-          <p className={styles.sectionLabel}>Research</p>
-          <h2 className={styles.sectionTitle}>Publications</h2>
-        </div>
+    <div id="publications">
+      <div data-reveal className={styles.reveal}>
+        <p className={styles.sectionLabel}>Research</p>
+        <h2 className={styles.sectionTitle}>Publications</h2>
+      </div>
+      <div className={styles.pubList}>
         {publications.map((pub, i) => (
           <div
             key={i}
@@ -76,6 +76,6 @@ export default function PublicationsSection() {
           </div>
         ))}
       </div>
-    </section>
+    </div>
   );
 }

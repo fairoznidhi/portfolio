@@ -10,7 +10,7 @@ const navLinks = [
   { to: "/publications", label: "Publications" },
   { to: "/projects", label: "Projects" },
   { to: "/blog", label: "Blogs" },
-  { to: "/achievements", label: "Achievements" },
+  { to: "/others", label: "Others" },
 ];
 
 export default function Navbar() {

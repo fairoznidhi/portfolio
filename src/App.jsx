@@ -6,7 +6,7 @@ import SiteFooter from './components/sections/SiteFooter';
 import About from './pages/About';
 import Experience from './pages/Experience';
 import Publications from './pages/Publications';
-import Achievements from './pages/Achievements';
+import Others from './pages/Others';
 import Projects from './pages/Projects';
 import BlogList from './pages/BlogList';
 import BlogPost from './pages/BlogPost';
@@ -28,7 +28,7 @@ export default function App() {
               <Route path="/projects" element={<Projects />} />
               <Route path="/blog" element={<BlogList />} />
               <Route path="/blog/:id" element={<BlogPost />} />
-              <Route path="/achievements" element={<Achievements />} />
+              <Route path="/others" element={<Others />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
