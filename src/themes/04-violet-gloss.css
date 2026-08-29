@@ -1,0 +1,93 @@
+/* ============================================================
+   THEME 04 — VIOLET GLOSS (FirmWise slide reference)
+   Cool lavender-grey page, white cards, vivid violet primary,
+   soft lavender secondary, violet gradients + glossy shadows.
+   Palette-only snapshot: paste these values into src/index.css
+   (:root and :root[data-theme='dark'] token blocks).
+   ============================================================ */
+
+:root {
+  /* Core Legacy Hex Tokens (CSS Modules) */
+  --bg: #eef0f7;
+  --bg2: #ffffff;
+  --bg3: #ebe8f8;
+  --border: #dcdfec;
+  --text: #17142b;
+  --text2: #4d4a63;
+  --text3: #8f8ca6;
+  --accent: #5b2ee0;
+  --accent2: #9d7bf5;
+  --accent2-ink: #ffffff;
+  --accent2-soft: rgb(var(--accent2-rgb) / 0.18);
+  --grad-accent: linear-gradient(180deg, #7a53ee 0%, #5b2ee0 100%);
+  --shadow-card: 0 12px 32px rgb(var(--dark-rgb) / 0.08),
+    inset 0 1px 0 rgb(255 255 255 / 0.6);
+  --green: #16a34a;
+
+  /* RGB channels for opacity compositing */
+  --accent-rgb: 91 46 224;
+  --green-rgb: 22 163 74;
+  --accent2-rgb: 157 123 245;
+  --dark-rgb: 23 20 43;
+
+  /* shadcn/ui HSL tokens */
+  --sc-background: 227 36% 95%;
+  --sc-foreground: 248 37% 12%;
+  --sc-card: 0 0% 100%;
+  --sc-card-foreground: 248 37% 12%;
+  --sc-popover: 0 0% 100%;
+  --sc-popover-foreground: 248 37% 12%;
+  --sc-primary: 255 74% 53%;
+  --sc-primary-foreground: 0 0% 100%;
+  --sc-secondary: 257 86% 72%;
+  --sc-secondary-foreground: 0 0% 100%;
+  --sc-muted: 254 55% 90%;
+  --sc-muted-foreground: 247 14% 34%;
+  --sc-accent: 255 74% 53%;
+  --sc-accent-foreground: 0 0% 100%;
+  --sc-destructive: 0 84% 60%;
+  --sc-destructive-foreground: 0 0% 100%;
+  --sc-border: 229 30% 89%;
+  --sc-input: 229 30% 89%;
+  --sc-ring: 255 74% 53%;
+}
+
+:root[data-theme="dark"] {
+  --bg: #100c1f;
+  --bg2: #171230;
+  --bg3: #201a40;
+  --border: #2c2454;
+  --text: #f0eff8;
+  --text2: #a09cba;
+  --text3: #6f6a8e;
+  --accent: #9d7bf5;
+  --accent2: #c4b5fd;
+  --accent2-ink: #100c1f;
+  --grad-accent: linear-gradient(180deg, #b198f8 0%, #8b66f3 100%);
+  --shadow-card: 0 12px 32px rgb(0 0 0 / 0.4),
+    inset 0 1px 0 rgb(255 255 255 / 0.06);
+  --green: #4ade80;
+  --accent-rgb: 157 123 245;
+  --green-rgb: 74 222 128;
+  --accent2-rgb: 196 181 253;
+
+  --sc-background: 253 44% 8%;
+  --sc-foreground: 247 39% 95%;
+  --sc-card: 250 45% 13%;
+  --sc-card-foreground: 247 39% 95%;
+  --sc-popover: 250 45% 13%;
+  --sc-popover-foreground: 247 39% 95%;
+  --sc-primary: 257 86% 72%;
+  --sc-primary-foreground: 253 44% 8%;
+  --sc-secondary: 253 95% 85%;
+  --sc-secondary-foreground: 253 44% 8%;
+  --sc-muted: 250 42% 18%;
+  --sc-muted-foreground: 248 18% 67%;
+  --sc-accent: 257 86% 72%;
+  --sc-accent-foreground: 253 44% 8%;
+  --sc-destructive: 0 62% 50%;
+  --sc-destructive-foreground: 247 39% 95%;
+  --sc-border: 250 40% 24%;
+  --sc-input: 250 40% 24%;
+  --sc-ring: 257 86% 72%;
+}
