@@ -1,87 +1,36 @@
 .nav {
   position: fixed;
   top: 0;
-  left: 0;
+  left: max(256px, calc(50% - 720px + 256px)); /* right edge of the fixed rail */
   right: 0;
   z-index: 100;
-  padding: 10px 0;
+  height: var(--nav-h);
   background: var(--bg);
   border-bottom: 1px solid var(--border);
-  transition:
-    padding 0.3s ease,
-    background 0.3s ease;
+  transition: box-shadow 0.3s ease;
 }
 
 .scrolled {
-  padding: 6px 0;
   box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
 }
 
 .inner {
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 0 24px 0 344px; /* 320px sidebar + 24px gutter */
+  height: 100%;
+  max-width: 1184px; /* 1440 − 256 rail */
+  margin-right: auto;
+  padding: 0 32px;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: space-between;
   gap: 40px;
 }
 
 @media (max-width: 980px) {
-  .inner { padding: 0 24px; }
+  .nav { left: 0; }
 }
 
-/* SEGMENTED NAV */
-.segments {
-  display: flex;
-  align-items: center;
-}
-
-.segment {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 18px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text2);
-  letter-spacing: -0.01em;
-  transition: color 0.18s ease;
-}
-
-/* full-height divider between cells */
-.segment + .segment::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 6px;
-  bottom: 6px;
-  width: 1px;
-  background: var(--border);
-}
-
-.segment:hover {
-  color: var(--text);
-}
-
-.segment > span {
-  position: relative;
-  z-index: 1;
-}
-
-/* active pill sits inside the cell, clear of dividers */
-.active {
-  color: var(--accent);
-}
-
-.active::after {
-  content: "";
-  position: absolute;
-  inset: 5px 6px;
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-  border-radius: 8px;
-  z-index: 0;
+@media (max-width: 480px) {
+  .inner { padding: 0 20px; }
 }
 
 /* THEME TOGGLE — sliding pill */

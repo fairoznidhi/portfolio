@@ -10,7 +10,7 @@ export default function PageShell({ title, subtitle, children }) {
 
   return (
     <div ref={ref} className={homeStyles.page}>
-      <div className="mx-auto max-w-[1100px] px-8 max-[480px]:px-5">
+      <div className="mr-auto max-w-[1184px] px-8 max-[480px]:px-5">
         {(title || subtitle) && (
           <header className="mb-10 max-[480px]:mb-8">
             {title && (

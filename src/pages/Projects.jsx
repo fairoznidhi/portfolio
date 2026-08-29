@@ -1,5 +1,6 @@
 import { ArrowUpRight } from 'lucide-react';
 import PageShell from '../components/PageShell';
+import { Card } from '@/components/ui/card';
 import { projects } from '../data/portfolio';
 import styles from './Projects.module.css';
 
@@ -11,7 +12,7 @@ export default function Projects() {
     >
       <div className={styles.grid}>
         {projects.map((proj, i) => (
-          <div key={i} className={styles.card}>
+          <Card key={i} className="p-8 transition-transform duration-300 hover:-translate-y-1">
             <div className={styles.cardTop}>
               <div className={styles.status}>
                 <span className={proj.status === 'Live' ? styles.statusLive : styles.statusOther} />
@@ -35,7 +36,7 @@ export default function Projects() {
             <div className={styles.tags}>
               {proj.tags.map(t => <span key={t} className={styles.tag}>{t}</span>)}
             </div>
-          </div>
+          </Card>
         ))}
       </div>
     </PageShell>

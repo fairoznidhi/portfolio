@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Sun, Moon } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useTheme } from "../hooks/useTheme";
 import styles from "./Navbar.module.css";
 
@@ -33,19 +34,24 @@ export default function Navbar() {
   return (
     <nav className={`${styles.nav} ${scrolled ? styles.scrolled : ""}`}>
       <div className={styles.inner}>
-        <div className={styles.segments}>
+        <div className="flex h-full items-stretch divide-x divide-[var(--border)] border-x border-[var(--border)]">
           {navLinks.map((l) => (
             <Link
               key={l.to}
               to={l.to}
-              className={`${styles.segment} ${isActive(l.to) ? styles.active : ""}`}
+              className={cn(
+                "flex items-center px-5 text-sm font-medium tracking-[-0.01em] transition-colors",
+                isActive(l.to)
+                  ? "bg-[color-mix(in_srgb,var(--accent)_12%,transparent)] text-[var(--accent)]"
+                  : "text-[var(--text2)] hover:text-[var(--text)]",
+              )}
               onClick={() => {
                 if (location.pathname === l.to) {
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }
               }}
             >
-              <span>{l.label}</span>
+              {l.label}
             </Link>
           ))}
         </div>

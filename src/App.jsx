@@ -32,9 +32,9 @@ export default function App() {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
+          <SiteFooter />
         </div>
       </div>
-      <SiteFooter />
     </BrowserRouter>
   );
 }

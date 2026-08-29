@@ -5,77 +5,95 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* Light theme (default) — legacy hex tokens (CSS Modules) */
-  --bg: #fdfaf1;
-  --bg2: #f7f2e6;
-  --bg3: #efe9d9;
-  --border: #e4ddc9;
-  --text: #1c1a17;
-  --text2: #57534c;
-  --text3: #8f887c;
-  --accent: #8a6a2f;
-  --accent2: #ab8748;
-  --green: #15803d;
+  /* ===== THEME 04 — VIOLET GLOSS (LIVE) ===== */
+  /* Core Legacy Hex Tokens (CSS Modules) */
+  --bg: #ffffff;
+  --bg2: #f6f5fd;
+  --bg3: #efeafb;
+  --border: #e6e4f0;
+  --text: #17142b;
+  --text2: #4d4a63;
+  --text3: #8f8ca6;
+  --accent: #5b2ee0;
+  --accent2: #9d7bf5;
+  --accent2-ink: #ffffff;
+  --accent2-soft: rgb(var(--accent2-rgb) / 0.18);
+  --grad-accent: linear-gradient(180deg, #7a53ee 0%, #5b2ee0 100%);
+  --shadow-card: 0 12px 32px rgb(var(--dark-rgb) / 0.08),
+    inset 0 1px 0 rgb(255 255 255 / 0.6);
+  --green: #16a34a;
+
+  /* RGB channels for opacity compositing — keep in sync with the hexes */
+  --accent-rgb: 91 46 224;
+  --green-rgb: 22 163 74;
+  --accent2-rgb: 157 123 245;
+  --dark-rgb: 23 20 43;
+
   --font-serif: 'Inter', system-ui, sans-serif;
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-mono: 'Inter', system-ui, sans-serif;
 
-  /* shadcn/ui HSL tokens (Tailwind) — prefixed to avoid colliding with legacy hex tokens */
-  --sc-background: 43 63% 97%;
-  --sc-foreground: 30 12% 10%;
-  --sc-card: 41 47% 93%;
-  --sc-card-foreground: 30 12% 10%;
-  --sc-popover: 43 63% 97%;
-  --sc-popover-foreground: 30 12% 10%;
-  --sc-primary: 36 49% 36%;
-  --sc-primary-foreground: 43 63% 97%;
-  --sc-secondary: 42 38% 89%;
-  --sc-secondary-foreground: 30 12% 10%;
-  --sc-muted: 42 38% 89%;
-  --sc-muted-foreground: 36 7% 40%;
-  --sc-accent: 41 47% 91%;
-  --sc-accent-foreground: 36 49% 30%;
-  --sc-destructive: 0 72% 45%;
-  --sc-destructive-foreground: 43 63% 97%;
-  --sc-border: 44 38% 84%;
-  --sc-input: 44 38% 84%;
-  --sc-ring: 36 49% 36%;
+  /* shadcn/ui HSL tokens (Tailwind) */
+  --sc-background: 0 0% 100%;
+  --sc-foreground: 248 37% 12%;
+  --sc-card: 252 60% 98%;
+  --sc-card-foreground: 248 37% 12%;
+  --sc-popover: 0 0% 100%;
+  --sc-popover-foreground: 248 37% 12%;
+  --sc-primary: 255 74% 53%;
+  --sc-primary-foreground: 0 0% 100%;
+  --sc-secondary: 257 86% 72%;
+  --sc-secondary-foreground: 0 0% 100%;
+  --sc-muted: 254 55% 90%;
+  --sc-muted-foreground: 247 14% 34%;
+  --sc-accent: 255 74% 53%;
+  --sc-accent-foreground: 0 0% 100%;
+  --sc-destructive: 0 84% 60%;
+  --sc-destructive-foreground: 0 0% 100%;
+  --sc-border: 229 30% 89%;
+  --sc-input: 229 30% 89%;
+  --sc-ring: 255 74% 53%;
   --radius: 0.6rem;
 }
 
 :root[data-theme='dark'] {
-  --sc-background: 0 0% 5%;
-  --sc-foreground: 38 25% 89%;
-  --sc-card: 0 0% 8%;
-  --sc-card-foreground: 38 25% 89%;
-  --sc-popover: 0 0% 8%;
-  --sc-popover-foreground: 38 25% 89%;
-  --sc-primary: 36 46% 61%;
-  --sc-primary-foreground: 0 0% 5%;
-  --sc-secondary: 0 0% 10%;
-  --sc-secondary-foreground: 38 25% 89%;
-  --sc-muted: 0 0% 10%;
-  --sc-muted-foreground: 36 8% 55%;
-  --sc-accent: 0 0% 12%;
-  --sc-accent-foreground: 36 46% 70%;
-  --sc-destructive: 0 62% 50%;
-  --sc-destructive-foreground: 38 25% 89%;
-  --sc-border: 0 0% 16%;
-  --sc-input: 0 0% 16%;
-  --sc-ring: 36 46% 61%;
-}
-
-:root[data-theme='dark'] {
-  --bg: #0d0d0d;
-  --bg2: #141414;
-  --bg3: #1a1a1a;
-  --border: #2a2a2a;
-  --text: #e8e4dc;
-  --text2: #8a8580;
-  --text3: #5a5550;
-  --accent: #c8a96e;
-  --accent2: #e8c87a;
+  --bg: #100c1f;
+  --bg2: #171230;
+  --bg3: #201a40;
+  --border: #2c2454;
+  --text: #f0eff8;
+  --text2: #a09cba;
+  --text3: #6f6a8e;
+  --accent: #9d7bf5;
+  --accent2: #c4b5fd;
+  --accent2-ink: #100c1f;
+  --grad-accent: linear-gradient(180deg, #b198f8 0%, #8b66f3 100%);
+  --shadow-card: 0 12px 32px rgb(0 0 0 / 0.4),
+    inset 0 1px 0 rgb(255 255 255 / 0.06);
   --green: #4ade80;
+  --accent-rgb: 157 123 245;
+  --green-rgb: 74 222 128;
+  --accent2-rgb: 196 181 253;
+
+  --sc-background: 253 44% 8%;
+  --sc-foreground: 247 39% 95%;
+  --sc-card: 250 45% 13%;
+  --sc-card-foreground: 247 39% 95%;
+  --sc-popover: 250 45% 13%;
+  --sc-popover-foreground: 247 39% 95%;
+  --sc-primary: 257 86% 72%;
+  --sc-primary-foreground: 253 44% 8%;
+  --sc-secondary: 253 95% 85%;
+  --sc-secondary-foreground: 253 44% 8%;
+  --sc-muted: 250 42% 18%;
+  --sc-muted-foreground: 248 18% 67%;
+  --sc-accent: 257 86% 72%;
+  --sc-accent-foreground: 253 44% 8%;
+  --sc-destructive: 0 62% 50%;
+  --sc-destructive-foreground: 247 39% 95%;
+  --sc-border: 250 40% 24%;
+  --sc-input: 250 40% 24%;
+  --sc-ring: 257 86% 72%;
 }
 
 html {
@@ -85,7 +103,7 @@ html {
   overflow-y: scroll;
 }
 
-:root { --nav-h: 68px; }
+:root { --nav-h: 52px; }
 
 body {
   background: var(--bg);
@@ -97,6 +115,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  overflow-x: clip;
 }
 
 a { color: inherit; text-decoration: none; }
@@ -121,22 +140,25 @@ h1, h2, h3, h4 {
 
 .shell {
   flex: 1;
-  display: flex;
   width: 100%;
   max-width: 1440px;
   margin: 0 auto;
+  display: flex;
+  /* the fixed rail is positioned against this container via left: calc(...) */
+  position: relative;
 }
 
 .layout {
   flex: 1;
   min-width: 0;
+  margin-left: 256px; /* fixed sidebar width */
   display: flex;
   flex-direction: column;
 }
 
 .content {
   flex: 1;
-  padding-top: var(--nav-h); /* fixed navbar height */
+  padding-top: var(--nav-h);
 }
 
 @media (max-width: 980px) {

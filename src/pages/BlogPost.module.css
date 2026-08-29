@@ -30,8 +30,8 @@
   font-size: 0.72rem;
   font-family: var(--font-mono);
   color: var(--accent);
-  background: rgba(200, 169, 110, 0.1);
-  border: 1px solid rgba(200, 169, 110, 0.2);
+  background: rgb(var(--accent-rgb) / 0.1);
+  border: 1px solid rgb(var(--accent-rgb) / 0.2);
   padding: 3px 10px;
   border-radius: 100px;
 }
