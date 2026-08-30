@@ -167,7 +167,11 @@ h1, h2, h3, h4 {
 }
 
 @media (max-width: 980px) {
+  /* stack the sidebar block above the main layout instead of side-by-side */
+  .shell { flex-direction: column; }
   .layout { margin-left: 0; }
+  /* sidebar is only shown on the About page in mobile view */
+  .sidebar-hide-mobile { display: none !important; }
 }
 
 ::selection {

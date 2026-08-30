@@ -1,4 +1,5 @@
 import { Download } from "lucide-react";
+import { useLocation } from "@tanstack/react-router";
 import { personalInfo } from "../data/portfolio";
 import { LinkedinBrandIcon, GithubBrandIcon } from "./icons";
 import CopyButton from "./CopyButton";
@@ -6,6 +7,9 @@ import CopyButton from "./CopyButton";
 const infoRow = "flex items-center gap-1 text-[0.82rem] text-[var(--text2)]";
 
 export default function Sidebar() {
+  const { pathname } = useLocation();
+  const isAbout = pathname === "/";
+
   return (
     <aside
       className={[
@@ -13,7 +17,10 @@ export default function Sidebar() {
         "left-[max(0px,calc(50%-720px))] pb-7 pl-[22px] pr-[22px] pt-[calc(var(--nav-h)+28px)]",
         "max-[980px]:static max-[980px]:h-auto max-[980px]:w-full max-[980px]:inset-auto",
         "max-[980px]:overflow-visible max-[980px]:border-b max-[980px]:border-r-0 max-[980px]:px-6 max-[980px]:pb-6 max-[980px]:pt-20",
-      ].join(" ")}
+        !isAbout && "sidebar-hide-mobile",
+      ]
+        .filter(Boolean)
+        .join(" ")}
     >
       <div className="flex flex-col items-center gap-8 max-[980px]:mx-auto max-[980px]:max-w-[380px]">
         {/* group 1: image, name, designation */}
