@@ -1,20 +1,11 @@
-import { useState } from "react";
-import { Download, Copy, Check } from "lucide-react";
+import { Download } from "lucide-react";
 import { personalInfo } from "../data/portfolio";
 import { LinkedinBrandIcon, GithubBrandIcon } from "./icons";
+import CopyButton from "./CopyButton";
 
 const infoRow = "flex items-center gap-1 text-[0.82rem] text-[var(--text2)]";
 
 export default function Sidebar() {
-  const [copied, setCopied] = useState(false);
-
-  const copyEmail = () => {
-    navigator.clipboard.writeText(personalInfo.email).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    });
-  };
-
   return (
     <aside
       className={[
@@ -66,23 +57,7 @@ export default function Sidebar() {
               >
                 {personalInfo.email}
               </a>
-              <button
-                type="button"
-                onClick={copyEmail}
-                aria-label={copied ? "Email copied" : "Copy email"}
-                title={copied ? "Copied!" : "Copy email"}
-                className="shrink-0 border-0 bg-transparent p-0 text-[var(--text3)] transition-colors hover:text-[var(--accent)]"
-              >
-                {copied ? (
-                  <Check
-                    size={13}
-                    strokeWidth={2}
-                    className="text-[var(--accent)]"
-                  />
-                ) : (
-                  <Copy size={13} strokeWidth={1.75} />
-                )}
-              </button>
+              <CopyButton value={personalInfo.email} label="Copy email" />
             </li>
           </ul>
 

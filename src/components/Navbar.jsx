@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
+import { motion } from "framer-motion";
 import { Sun, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "../hooks/useTheme";
@@ -41,25 +42,35 @@ export default function Navbar() {
     >
       <div className="mr-auto flex h-full max-w-[1184px] items-stretch justify-between gap-10 px-8 max-[480px]:px-5">
         <div className="flex h-full items-stretch max-[760px]:hidden">
-          {navLinks.map((l) => (
-            <Link
-              key={l.to}
-              to={l.to}
-              className={cn(
-                "flex items-center px-5 text-sm font-medium tracking-[-0.01em] transition-colors",
-                isActive(l.to)
-                  ? "bg-[color-mix(in_srgb,var(--accent)_12%,transparent)] text-[var(--accent)]"
-                  : "text-[var(--text2)] hover:text-[var(--text)]",
-              )}
-              onClick={() => {
-                if (location.pathname === l.to) {
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }
-              }}
-            >
-              {l.label}
-            </Link>
-          ))}
+          {navLinks.map((l) => {
+            const active = isActive(l.to);
+            return (
+              <Link
+                key={l.to}
+                to={l.to}
+                className={cn(
+                  "relative flex items-center px-5 text-sm font-medium tracking-[-0.01em] transition-colors",
+                  active
+                    ? "text-[var(--accent)]"
+                    : "text-[var(--text2)] hover:text-[var(--text)]",
+                )}
+                onClick={() => {
+                  if (location.pathname === l.to) {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }
+                }}
+              >
+                {active && (
+                  <motion.span
+                    layoutId="nav-active"
+                    className="absolute inset-0 -z-10 bg-[color-mix(in_srgb,var(--accent)_12%,transparent)]"
+                    transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                  />
+                )}
+                {l.label}
+              </Link>
+            );
+          })}
         </div>
 
         <button
