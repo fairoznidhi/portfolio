@@ -2,7 +2,7 @@ import { createRootRoute, Outlet } from "@tanstack/react-router";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import ScrollToTop from "../components/ScrollToTop";
-import SiteFooter from "../components/sections/SiteFooter";
+import SiteFooter from "../components/SiteFooter";
 import NotFound from "../pages/NotFound";
 
 export const Route = createRootRoute({

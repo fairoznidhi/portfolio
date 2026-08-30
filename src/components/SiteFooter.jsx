@@ -1,4 +1,4 @@
-import { personalInfo } from "../../data/portfolio";
+import { personalInfo } from "../data/portfolio";
 
 export default function SiteFooter() {
   return (

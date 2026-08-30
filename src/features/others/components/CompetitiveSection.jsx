@@ -1,5 +1,5 @@
 import { ArrowUpRight, Trophy } from "lucide-react";
-import { competitive, achievements } from "../../data/portfolio";
+import { competitive, achievements } from "../../../data/portfolio";
 
 const subTitle =
   "mb-6 text-2xl font-normal text-[var(--text)]";

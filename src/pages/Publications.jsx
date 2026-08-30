@@ -1,5 +1,5 @@
 import PageShell from "../components/PageShell";
-import PublicationsSection from "../components/sections/PublicationsSection";
+import PublicationsSection from "../features/publications";
 
 export default function Publications() {
   return (

@@ -1,15 +1,14 @@
 import { ArrowUpRight } from "lucide-react";
 import PageShell from "../components/PageShell";
+import SectionLabel from "../components/SectionLabel";
 import { Card } from "@/components/ui/card";
 import { projects } from "../data/portfolio";
 
 export default function Projects() {
   return (
-    <PageShell
-      title="All Projects"
-      subtitle="A collection of things I've built — from ML models to full-stack web apps."
-    >
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(340px,1fr))] gap-6 max-[640px]:grid-cols-1">
+    <PageShell>
+      <SectionLabel>Projects</SectionLabel>
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(340px,1fr))] gap-6 pb-24 max-[640px]:grid-cols-1">
         {projects.map((proj, i) => (
           <Card
             key={i}

@@ -2,7 +2,7 @@ export const personalInfo = {
   name: "Tasfi Fairoz Nidhi",
   title: "Software Engineer L-1",
   company: "Vivasoft Limited",
-  bio: "Software engineer experienced in building scalable and efficient web applications. Passionate about problem-solving and competitive programming. I enjoy taking on challenges, learning continuously, and working closely with cross-functional teams to deliver meaningful software solutions.",
+  careerStart: "2024-12-01",
   email: "tasfi.fairoz@gmail.com",
   github: "https://github.com/fairoznidhi",
   linkedin: "https://linkedin.com/in/tasfifairoznidhi",
@@ -219,6 +219,7 @@ export const achievements = [
 
 export const publications = [
   {
+    category: "conference",
     title:
       "Triple Attention MobileNetV3: Harnessing Integrated Attention and Transfer Learning for Next-Generation Skin Lesion Detection",
     venue:
@@ -233,6 +234,19 @@ export const publications = [
 
     abstract:
       "Detecting skin lesions, especially cancerous melanoma, early is vital for effective treatment. However, traditional detection methods are costly, time-consuming, and involve numerous tests, making early detection challenging. This study introduces a new approach called Triple Attention MobileNetV3 (TAMN), which utilizes a novel multi-stream attention-infused Convolutional Neural Network (CNN) architecture based on Transfer Learning principles. TAMN aims to improve skin lesion recognition, offering a potentially more efficient solution. Data augmentation and careful dataset splitting addressed class imbalance, preventing biased modeling. This TAMN architecture integrated an Attention Module comprising Channel Attention, Squeeze and Excitation Attention, and Soft Attention mechanisms to emphasize crucial features and regions relevant to accurate classification. Gradient Class Activation Map (Grad-CAM) visualization identified areas the model focused on, improving interpretability and explainability. The proposed model achieved 99.56% accuracy on the PAD-UFES-20 dataset, outperforming the direct use of any pre-trained models. The attention modules significantly boosted metrics like precision, recall, F1-score and specificity compared to baselines, showcasing their efficacy in enhancing skin lesion classification for early cancer detection. The approach demonstrates the potential of attention-based deep learning models for accurate and interpretable skin lesion analysis, paving the way for improved early screening and diagnosis.",
+  },
+  {
+    category: "journal",
+    title:
+      "Dual Concatenated Transfer Learning with Attention Fusion: An Ensemble-Enhanced Approach for Skin Lesion Classification",
+    venue: "DIGITAL HEALTH (SAGE) — Q1 Journal",
+    type: "Journal Paper",
+    date: "2026",
+    authors:
+      "Probal Bhowmick, Julia Rahman, Anwar Hossain Efat, Tasfi Fairoz Nidhi, Dipanjan Karmaker Amit",
+    doi: "10.1177/20552076261458948",
+    link: "https://doi.org/10.1177/20552076261458948",
+    pdf: "/publications/dual-concatenated-transfer-learning-with-attention-fusion-an-ensemble-enhanced-approach-for-skin.pdf",
   },
 ];
 

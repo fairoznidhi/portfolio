@@ -1,4 +1,4 @@
-import { leadership } from "../../data/portfolio";
+import { leadership } from "../../../data/portfolio";
 
 export default function LeadershipSection() {
   return (
