@@ -3,7 +3,7 @@ export const personalInfo = {
   title: "Software Engineer L-1",
   company: "Vivasoft Limited",
   careerStart: "2024-12-01",
-  email: "tasfi.fairoz@gmail.com",
+  email: "tasfi.f.nidhi@gmail.com",
   github: "https://github.com/fairoznidhi",
   linkedin: "https://linkedin.com/in/tasfifairoznidhi",
   companyUrl: "https://vivasoftltd.com/",
@@ -25,7 +25,7 @@ export const education = [
     degree: "B.Sc. (Engg.) in Computer Science & Engineering",
     school: "Rajshahi University of Engineering & Technology",
     period: "Jan 2020 – Jun 2025",
-    detail: "CGPA: 3.84 / 4.00",
+    detail: "CGPA: 3.84 / 4.00 (3.96 in final 4 semesters)",
     highlights: [],
   },
   {
@@ -151,6 +151,8 @@ export const projects = [
 ];
 
 export const skills = {
+  Languages: ["Python", "Go", "C/C++", "JavaScript", "TypeScript"],
+  "Database Systems": ["PostgreSQL", "MySQL", "MongoDB"],
   Frontend: [
     "React",
     "Next.js",
@@ -170,8 +172,7 @@ export const skills = {
     "NumPy",
     "scikit-learn",
   ],
-  Languages: ["C/C++", "Python", "Java", "JavaScript", "TypeScript", "PHP"],
-  Database: ["MySQL", "MongoDB"],
+
   "Tools & Infra": ["Docker", "Git", "AWS"],
 };
 
@@ -231,6 +232,17 @@ export const publications = [
     link: "https://ieeexplore.ieee.org/document/10796988",
     doi: "10.1109/COMPAS60761.2024.10796988",
     pdf: "/publications/Triple_Attention_MobileNetV3_Harnessing_Integrated_Attention_and_Transfer_Learning_for_Next-Generation_Skin_Lesion_Detection.pdf",
+    image: "/publications/images/compas-2024.png",
+    bibtex: `@INPROCEEDINGS{10796988,
+  author={Nidhi, Tasfi Fairoz and Hossain Efat, Anwar and Mahedy Hasan, S. M. and Shahid Uz Zaman, Md. and Wasit, Abdun Nur},
+  booktitle={2024 IEEE International Conference on Computing, Applications and Systems (COMPAS)},
+  title={Triple Attention MobileNetV3: Harnessing Integrated Attention and Transfer Learning for Next-Generation Skin Lesion Detection},
+  year={2024},
+  volume={},
+  number={},
+  pages={1-6},
+  keywords={Visualization;Accuracy;Attention mechanisms;Transfer learning;Merging;Skin;Robustness;Lesions;Convolutional neural networks;Next generation networking;Triple Attention MobileNetV3;Attention mechanisms;Transfer Learning;Skin lesion classification;Grad-CAM visualization;PAD-UFES-20;Augmentation;Fine-tuning},
+  doi={10.1109/COMPAS60761.2024.10796988}}`,
 
     abstract:
       "Detecting skin lesions, especially cancerous melanoma, early is vital for effective treatment. However, traditional detection methods are costly, time-consuming, and involve numerous tests, making early detection challenging. This study introduces a new approach called Triple Attention MobileNetV3 (TAMN), which utilizes a novel multi-stream attention-infused Convolutional Neural Network (CNN) architecture based on Transfer Learning principles. TAMN aims to improve skin lesion recognition, offering a potentially more efficient solution. Data augmentation and careful dataset splitting addressed class imbalance, preventing biased modeling. This TAMN architecture integrated an Attention Module comprising Channel Attention, Squeeze and Excitation Attention, and Soft Attention mechanisms to emphasize crucial features and regions relevant to accurate classification. Gradient Class Activation Map (Grad-CAM) visualization identified areas the model focused on, improving interpretability and explainability. The proposed model achieved 99.56% accuracy on the PAD-UFES-20 dataset, outperforming the direct use of any pre-trained models. The attention modules significantly boosted metrics like precision, recall, F1-score and specificity compared to baselines, showcasing their efficacy in enhancing skin lesion classification for early cancer detection. The approach demonstrates the potential of attention-based deep learning models for accurate and interpretable skin lesion analysis, paving the way for improved early screening and diagnosis.",
