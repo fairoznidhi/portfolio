@@ -26,7 +26,7 @@ export default function Sidebar() {
         {/* group 1: image, name, designation */}
         <div className="flex flex-col items-center gap-2">
           <img
-            src="/images/profile.jpg"
+            src="/images/profile.jpeg"
             alt={personalInfo.name}
             className="h-36 w-36 rounded-[14px] object-cover brightness-[0.94]"
           />
