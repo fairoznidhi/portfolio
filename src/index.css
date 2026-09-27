@@ -161,6 +161,10 @@ h1, h2, h3, h4 {
   overflow-x: clip; /* contains the footer's full-bleed right extension */
 }
 
+.layout-full {
+  margin-left: 0; /* sidebar is hidden on blog detail pages */
+}
+
 .content {
   flex: 1;
   padding-top: var(--nav-h);

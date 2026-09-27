@@ -1,10 +1,20 @@
 import { personalInfo } from "../data/portfolio";
 
-export default function SiteFooter() {
+export default function SiteFooter({ withSidebar = true }) {
   return (
-    <footer className="pl-[max(256px,calc(50%-720px+256px))] max-[980px]:pl-0">
+    <footer
+      className={
+        withSidebar
+          ? "pl-[max(256px,calc(50%-720px+256px))] max-[980px]:pl-0"
+          : ""
+      }
+    >
       <div className="border-t border-border bg-[var(--bg2)] py-[18px]">
-        <div className="mr-auto flex w-full max-w-[1184px] items-center justify-between px-8 text-[0.78rem] text-[var(--text3)] max-[900px]:flex-col max-[900px]:gap-4 max-[900px]:text-center">
+        <div
+          className={`flex w-full max-w-[1184px] items-center justify-between px-8 text-[0.78rem] text-[var(--text3)] max-[900px]:flex-col max-[900px]:gap-4 max-[900px]:text-center ${
+            withSidebar ? "mr-auto" : "mx-auto"
+          }`}
+        >
         <span>© 2026 Tasfi Fairoz Nidhi</span>
         <div className="flex gap-6">
           <a

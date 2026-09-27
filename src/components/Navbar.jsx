@@ -14,7 +14,7 @@ const navLinks = [
   { to: "/others", label: "Others" },
 ];
 
-export default function Navbar() {
+export default function Navbar({ withSidebar = true }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
@@ -29,18 +29,26 @@ export default function Navbar() {
 
   useEffect(() => setMenuOpen(false), [location.pathname]);
 
-  const isActive = (to) =>
-    to === "/" ? location.pathname === "/" : location.pathname.startsWith(to);
+  const isActive = (to) => location.pathname === to;
 
   return (
     <nav
       className={cn(
         "fixed right-0 top-0 z-[100] h-[var(--nav-h)] border-b border-border bg-[var(--bg)] transition-shadow duration-300",
-        "left-[max(256px,calc(50%-720px+256px))] max-[980px]:left-0",
+        withSidebar
+          ? "left-[max(256px,calc(50%-720px+256px))] max-[980px]:left-0"
+          : "left-0",
         scrolled && "shadow-[0_1px_8px_rgba(0,0,0,0.06)]",
       )}
     >
-      <div className="mr-auto flex h-full max-w-[1184px] items-stretch justify-between gap-10 px-8 max-[480px]:px-5">
+      <div
+        className={cn(
+          "flex h-full max-w-[1184px] items-stretch justify-between gap-10 px-8 max-[480px]:px-5",
+          withSidebar
+            ? "mr-auto"
+            : "ml-[max(0px,calc(50%-720px+256px))] max-[980px]:ml-0",
+        )}
+      >
         <div className="flex h-full items-stretch max-[760px]:hidden">
           {navLinks.map((l) => {
             const active = isActive(l.to);
