@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Life of a Prompt</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* layout idea: one vertical timeline of 13 clickable steps, colored by who does the work */
+:root{
+  --bg:#f4f5f7; --surface:#ffffff; --ink:#151a22; --muted:#596273; --line:#dce0e6; --soft:#eef0f3;
+  --client:#546073; --server:#0f766e; --runtime:#a3480a; --model:#6232c9;
+  --special:#fdf0c9; --specialink:#6b4a00; --new:#d6f3e4; --newink:#0b5132;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0f1318; --surface:#171c23; --ink:#e8ebf0; --muted:#9aa4b4; --line:#2a313b; --soft:#1e252d;
+    --client:#9aa7bb; --server:#2dd4bf; --runtime:#fbbf24; --model:#b69cff;
+    --special:#3a3115; --specialink:#f5d98a; --new:#143626; --newink:#8fe3b5;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0f1318; --surface:#171c23; --ink:#e8ebf0; --muted:#9aa4b4; --line:#2a313b; --soft:#1e252d;
+  --client:#9aa7bb; --server:#2dd4bf; --runtime:#fbbf24; --model:#b69cff;
+  --special:#3a3115; --specialink:#f5d98a; --new:#143626; --newink:#8fe3b5;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 var(--sans);-webkit-text-size-adjust:100%}
+.wrap{max-width:860px;margin:0 auto;padding:0 16px 64px}
+.top{position:sticky;top:0;z-index:20;background:var(--bg);padding:16px 0 12px;margin:0 0 16px;border-bottom:1px solid var(--line)}
+.toprow{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.top h1{margin:0}
+.top .lead{margin:6px 0 0;font-size:14px;line-height:1.5}
+.walk{margin:0!important;flex-wrap:nowrap!important}
+.step{scroll-margin-top:90px}
+@media (max-height:620px){.top .lead{display:none}}
+h1{font-size:28px;line-height:1.2;margin:0 0 6px;font-weight:600;text-wrap:balance}
+.lead{color:var(--muted);margin:0 0 18px;max-width:65ch}
+.ask{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:0 0 18px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.ask b{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:500}
+.ask code{font-family:var(--mono);font-size:15px}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;align-items:center}
+.legend small{color:var(--muted);margin-right:2px}
+.fchip{font:inherit;font-size:13px;cursor:pointer;padding:4px 11px;border-radius:999px;border:1px solid var(--c);color:var(--c);background:color-mix(in srgb,var(--c) 8%,var(--surface))}
+.fchip[aria-pressed="true"]{background:var(--c);color:var(--surface)}
+.fchip:focus-visible,.sh:focus-visible,.btn:focus-visible,.pbtn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.walk{display:flex;gap:8px;align-items:center;margin:0 0 18px;flex-wrap:wrap}
+.btn{font:inherit;font-size:14px;cursor:pointer;padding:6px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.count{color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums}
+.band{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:22px 0 8px;font-weight:500;display:flex;align-items:center;gap:10px}
+.band:after{content:"";flex:1;height:1px;background:var(--line)}
+.step{--c:var(--server);background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:10px;margin:0 0 8px;transition:opacity .15s}
+.step.dim{opacity:.38}
+.step.open{border-color:var(--c)}
+.sh{all:unset;box-sizing:border-box;width:100%;cursor:pointer;display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:center;padding:11px 14px}
+.num{width:26px;height:26px;border-radius:50%;background:var(--c);color:var(--surface);font:500 13px/26px var(--mono);text-align:center}
+.st{font-weight:600;font-size:16px;line-height:1.3}
+.ss{color:var(--muted);font-size:14px;line-height:1.4;display:block;font-weight:400}
+.own{font-size:12px;color:var(--c);border:1px solid var(--c);padding:1px 9px;border-radius:999px;white-space:nowrap;background:color-mix(in srgb,var(--c) 9%,var(--surface))}
+.body{padding:2px 16px 16px 54px}
+.sec{margin:12px 0 0}
+.sec h4{margin:0 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--c);font-weight:600}
+.sec p{margin:0;max-width:68ch}
+.sec ul{margin:4px 0 0;padding-left:18px}
+.sec li{margin:2px 0}
+pre{margin:6px 0 0;padding:10px 12px;background:var(--soft);border-radius:8px;overflow-x:auto;font:13px/1.55 var(--mono)}
+.mono{font-family:var(--mono);font-size:13px}
+.sp{background:var(--special);color:var(--specialink);border-radius:4px;padding:0 3px}
+.note{font-size:13px;color:var(--muted);margin-top:6px}
+.strip{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.tok{display:inline-flex;flex-direction:column;align-items:center;border:1px solid var(--line);background:var(--soft);border-radius:6px;padding:2px 6px;font:12px/1.35 var(--mono)}
+.tok i{font-style:normal;color:var(--muted);font-size:11px}
+.tok.s{background:var(--special);color:var(--specialink);border-color:transparent}
+.tok.s i{color:var(--specialink);opacity:.8}
+.tok.n{background:var(--new);color:var(--newink);border-color:transparent}
+.tok.n i{color:var(--newink);opacity:.85}
+.flow{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-top:6px}
+.flow .box{background:var(--soft);border-radius:8px;padding:8px 10px;font:13px/1.5 var(--mono);overflow-wrap:anywhere}
+.flow .arr{color:var(--c);font-size:20px}
+@media (max-width:600px){.flow{grid-template-columns:1fr}.flow .arr{transform:rotate(90deg);justify-self:center}.body{padding-left:16px}.sh{grid-template-columns:30px 1fr}.own{grid-column:2;justify-self:start}}
+.row{display:grid;grid-template-columns:minmax(96px,150px) 1fr 64px;gap:8px;align-items:center;margin:4px 0;font:13px/1.3 var(--mono)}
+.track{background:var(--soft);border-radius:4px;height:12px;overflow:hidden}
+.bar{height:100%;background:var(--c);border-radius:4px;transition:width .2s}
+.row.pick .bar{outline:2px solid var(--ink)}
+.row .v{text-align:right;font-variant-numeric:tabular-nums}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
+.tbl th,.tbl td{border-bottom:1px solid var(--line);padding:5px 8px;text-align:left;font-weight:400;vertical-align:top}
+.tbl th{color:var(--muted);font-size:12px}
+.tbl td.m{font-family:var(--mono)}
+.tbl tr.cur td{background:color-mix(in srgb,var(--c) 12%,var(--surface))}
+.ctl{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px;font-size:14px}
+.ctl input[type=range]{accent-color:var(--c);width:180px;max-width:100%}
+.res{margin-top:8px;font-size:14px}
+.res b{font-family:var(--mono);font-weight:500}
+.stop{display:inline-block;background:var(--c);color:var(--surface);border-radius:6px;padding:0 8px;font-size:13px}
+.grp{--c:var(--server);position:relative;border:2px dotted var(--c);border-radius:14px;padding:34px 12px 4px;margin:0 0 14px}
+.gl{position:absolute;top:9px;left:16px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:var(--c)}
+.gl small{text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted);margin-left:8px;font-size:13px}
+.loop{border:2px dashed var(--muted);border-radius:18px;margin:0 0 14px;padding:12px 10px 0}
+.loop .grp{margin-bottom:10px}
+.grp .grp{margin-top:6px}
+.grp .grp .grp .step{margin-bottom:8px}
+.grp>.step:last-child{margin-bottom:10px}
+.loophead{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 10px;font-size:14px}
+.loophead strong{font-weight:600}
+.pbtn{font:inherit;font-size:13px;cursor:pointer;padding:3px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.pbtn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.loopback{font-size:13px;color:var(--runtime);margin:2px 0 10px 4px}
+.q{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.q span{border:1px solid var(--line);background:var(--soft);border-radius:6px;padding:3px 10px;font:13px var(--mono)}
+.q span.me{background:var(--c);color:var(--surface);border-color:var(--c)}
+.ok{color:var(--server)}
+.v1{margin-top:6px;display:flex;flex-direction:column;align-items:stretch}
+.stg{font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--c);margin:0 0 6px}
+.srcs{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}
+.win{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface);display:flex;flex-direction:column}
+.wt{display:flex;align-items:center;gap:4px;padding:5px 8px;background:var(--soft);border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}
+.wt i{width:8px;height:8px;border-radius:50%;background:var(--line);display:inline-block}
+.wt span{margin-left:6px}
+.wb{padding:8px 10px;margin:0;font-size:13px;flex:1}
+.win pre.wb{background:#10151c;color:#d8f3e6;border-radius:0;font:12px/1.5 var(--mono);white-space:pre-wrap;overflow-wrap:anywhere}
+.bub{background:var(--c);color:var(--surface);border-radius:12px 12px 2px 12px;padding:6px 10px;margin:0 0 8px auto;max-width:92%;width:fit-content}
+.inp{display:flex;justify-content:space-between;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;padding:4px 8px;color:var(--muted);font-size:12px}
+.inp b{font-weight:500;color:var(--ink);background:var(--soft);border-radius:4px;padding:0 6px}
+.vc{display:flex;flex-direction:column;align-items:center;margin:10px 0;color:var(--c)}
+.vc:before{content:"";width:4px;height:26px;background:var(--c);border-radius:2px}
+.vc span{font-size:13px;padding:4px 16px;border-radius:999px;background:var(--c);color:var(--surface);font-weight:600}
+.vc:after{content:"";width:0;height:0;border:13px solid transparent;border-top:16px solid var(--c);border-bottom:0;margin-top:0}
+.dt{background:#1d2026;color:#d5d8de;border-radius:8px;overflow:hidden;font:12px/1.65 var(--mono);border:1px solid #343a43}
+.dtt{display:flex;gap:16px;padding:6px 12px 0;background:#262a31;border-bottom:1px solid #343a43;color:#9aa0aa}
+.dtt span{padding:2px 0 6px;border-bottom:2px solid transparent}
+.dtt .on{color:#fff;border-bottom-color:#5aa8ff}
+.dts{padding:6px 12px 8px;border-bottom:1px solid #2b3037}
+.dts:last-child{border-bottom:0}
+.dts h5{margin:0 0 2px;font:600 12px var(--mono);color:#e8eaee}
+.kv{display:grid;grid-template-columns:130px minmax(0,1fr);gap:8px}
+.kv b{font-weight:600;color:#aeb4be}
+.kv span{overflow-wrap:anywhere}
+.dt .cm{color:#7d8590;font-style:italic}
+.dt .jk{color:#7ec7ff}.dt .js{color:#f0a674}.dt .jn{color:#b5e6a0}.dt .jb{color:#c9a7ff}
+.dt pre{margin:0;background:none;padding:0;font:12px/1.65 var(--mono);color:#d5d8de;white-space:pre-wrap;overflow-wrap:anywhere}
+.srv{border:1px dashed var(--server);color:var(--server);border-radius:8px;padding:6px 12px;text-align:center;font-size:13px;font-weight:500}
+@media (max-width:600px){.kv{grid-template-columns:1fr;gap:0}}
+.ov{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;margin:0 0 14px}
+.ov h3{margin:0 0 2px;font-size:16px;font-weight:600}
+.ov .sub{margin:0 0 10px;color:var(--muted);font-size:13px}
+.dgw{overflow-x:auto}
+.dg{display:block;width:100%;min-width:560px;height:auto}
+.dg .ar{fill:none;stroke:var(--muted);stroke-width:2}
+.dg .mk{fill:var(--muted)}
+.dg .bx{fill:none;stroke:var(--c);stroke-width:2;stroke-dasharray:2 5;stroke-linecap:round}
+.dg .bl{fill:var(--c);font:600 12px var(--sans);letter-spacing:.08em;text-anchor:end}
+.dg .lp{fill:none;stroke:var(--muted);stroke-width:2;stroke-dasharray:7 5}
+.dg .lpl{fill:var(--muted);font:600 11px var(--sans);letter-spacing:.06em;text-anchor:end}
+.dg .nd{cursor:pointer;outline:none}
+.dg .nd rect{fill:color-mix(in srgb,var(--c) 12%,var(--surface));stroke:var(--c);stroke-width:1.5}
+.dg .nd circle{fill:var(--c)}
+.dg .nn{fill:var(--surface);font:600 12px var(--mono);text-anchor:middle}
+.dg .nl{fill:var(--ink);font:500 12.5px var(--sans)}
+.dg .nd:hover rect,.dg .nd:focus-visible rect{stroke-width:3.5}
+.dg .al{fill:var(--muted);font:12px var(--sans)}
+.chk{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.cr{display:grid;grid-template-columns:30px minmax(0,1.4fr) minmax(0,1.6fr) auto;gap:10px;align-items:center;padding:7px 12px;border-top:1px solid var(--line)}
+.cr:first-child{border-top:0}
+.cr .ic{width:22px;height:22px;border-radius:50%;background:var(--c);color:var(--surface);font:600 12px/22px var(--mono);text-align:center}
+.cr b{font-weight:600;font-size:14px;display:block;line-height:1.3}
+.cr small{color:var(--muted);font-size:12px;display:block;line-height:1.3}
+.cr code{font:12px/1.4 var(--mono);overflow-wrap:anywhere}
+.pill{font-size:12px;font-weight:600;border-radius:999px;padding:1px 10px;border:1px solid var(--c);color:var(--c);background:color-mix(in srgb,var(--c) 10%,var(--surface))}
+.pill.skip{--c:var(--muted)}
+.dt .st2{color:#ff8a80;font-weight:600}
+.errs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.errs span{font:12px var(--mono);border:1px solid var(--line);background:var(--soft);border-radius:6px;padding:2px 8px}
+@media (max-width:600px){.cr{grid-template-columns:30px 1fr;gap:4px 10px}.cr .pill{justify-self:start;grid-column:2}}
+.qcol{display:flex;flex-direction:column;gap:6px}
+.qi{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);background:var(--soft);border-radius:8px;padding:7px 12px;font-size:14px}
+.qi .p{font:12px var(--mono);color:var(--muted)}
+.qi.me{background:var(--c);color:var(--surface);border-color:var(--c);font-weight:600}
+.qi.me .p{color:var(--surface)}
+.qi.gone{border-style:dashed;background:none;color:var(--muted)}
+.qend{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin:2px 2px 0}
+.srv.go{background:var(--c);color:var(--surface);border-style:solid}
+.srv.wait{color:var(--muted);border-color:var(--line)}
+.fl{display:flex;flex-direction:column}
+.fband{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;margin:6px 0 8px}
+.fn{display:grid;grid-template-columns:26px 1fr;gap:10px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface)}
+.fn .num{width:24px;height:24px;border-radius:50%;background:var(--c);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600}
+.fn h4{margin:0 0 2px;font-size:14px;font-weight:600}
+.fn p{margin:0 0 8px;font-size:13px;color:var(--muted);line-height:1.4}
+.fa{text-align:center;color:var(--muted);line-height:1;font-size:16px;margin:3px 0}
+.calc{margin-top:10px;padding:8px 12px;border:1px dashed var(--line);border-radius:8px;font-size:13px;line-height:1.55;color:var(--ink);background:var(--surface)}
+.calc b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;margin-bottom:2px}
+.v1{gap:10px}
+.sh{cursor:default}
+.more{margin-top:10px}
+.more summary{cursor:pointer;font-size:13px;color:var(--muted);list-style:revert}
+.more .kw{margin-top:6px}
+.step.open{box-shadow:0 0 0 2px var(--c)}
+.pl{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.lay{max-width:680px;display:block}
+.v1 .stg{margin:0 0 -4px}
+.v1 .ctl{margin-top:0}
+.v1 .wb{padding:6px 9px}
+.v1 .dts{padding:4px 11px 6px}
+.v1 .dtt{padding-top:4px}
+.v1 .dtt span{padding-bottom:4px}
+.v1 .cr{padding:5px 12px}
+.v1 .qi{padding:5px 12px}
+.v1 .srv{padding:5px 12px}
+.v1 .qcol{gap:4px}
+.body{padding-bottom:12px}
+.sec{margin-top:10px}
+.qrow{display:flex;align-items:stretch;gap:6px;flex-wrap:wrap}
+.ql{align-self:center;font-size:12px;color:var(--muted)}
+.qc{flex:1 1 90px;border:1px solid var(--line);background:var(--soft);border-radius:8px;padding:4px 10px;font-size:13px;text-align:center;line-height:1.3}
+.qc small{display:block;font:11px var(--mono);color:var(--muted)}
+.qc.me{background:var(--c);color:var(--surface);border-color:var(--c);font-weight:600}
+.qc.me small{color:var(--surface)}
+.cr{grid-template-columns:30px 1fr auto!important}
+.cr small{display:inline!important}
+.cr b{display:inline!important}
+.v1 .srcs{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.v1 .win pre.wb{padding:5px 9px}
+.v1 pre{font-size:12px}
+.sh{padding:9px 14px}
+.qbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border:1px dashed var(--line);border-radius:8px;padding:6px 8px 6px 12px;font-size:14px;color:var(--muted)}
+.qbar b{font-weight:600;color:var(--ink);margin-right:6px}
+.qbar.go{border:1px solid var(--c);background:color-mix(in srgb,var(--c) 10%,var(--surface))}
+.qbar.go b{color:var(--c)}
+.qbt{display:flex;gap:6px}
+.qbt .btn{padding:4px 12px;font-size:13px}
+.qbt .btn.primary{background:var(--c);border-color:var(--c);color:var(--surface)}
+.qbt .btn:disabled{opacity:.45;cursor:default}
+.kw{list-style:none;margin:10px 0 0;padding:0}
+.kw li{margin:2px 0;font-size:14px;line-height:1.5;padding-left:108px;text-indent:-108px}
+.kw b{text-indent:0;vertical-align:top;display:inline-block;min-width:108px;color:var(--c);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.pill.ok{--c:var(--server)}
+.pill.fail{--c:#d1483f}
+.pill.idle,.pill.skip{--c:var(--muted)}
+.qbar.bad{border:1px solid #d1483f;background:color-mix(in srgb,#d1483f 9%,var(--surface))}
+.qbar.bad b{color:#d1483f}
+.seg{display:inline-flex;align-items:center;gap:2px;border:1px solid var(--line);border-radius:8px;padding:2px;background:var(--soft);width:fit-content;max-width:100%;flex-wrap:wrap}
+.seg .sl{font-size:12px;color:var(--muted);padding:0 8px}
+.sb{font:inherit;font-size:13px;cursor:pointer;border:0;background:transparent;color:var(--ink);border-radius:6px;padding:3px 12px}
+.sb[aria-pressed="true"]{background:var(--c);color:var(--surface);font-weight:600}
+.sb:focus-visible{outline:2px solid var(--ink);outline-offset:1px}
+.tp{margin:0;background:var(--soft);padding:8px 12px;border-radius:8px;font:12.5px/1.6 var(--mono);white-space:pre-wrap;overflow-wrap:anywhere}
+.kvg{display:flex;flex-wrap:wrap;gap:3px}
+.kc{width:14px;height:14px;border-radius:3px;background:var(--soft);border:1px solid var(--line)}
+.kc.on{background:var(--c);border-color:var(--c)}
+.v1 .row{margin:2px 0}
+.v1 .qst input[type=range]{accent-color:var(--c);width:130px;vertical-align:middle}
+.v1 .qst .seg{margin-right:6px}
+.kr{display:grid;grid-template-columns:54px 1fr auto;gap:10px;align-items:center;margin:2px 0}
+.kl{font-size:13px;font-weight:600}
+.kt{font-size:12px;color:var(--muted);white-space:nowrap}
+@media (max-width:600px){.kr{grid-template-columns:54px 1fr}.kt{grid-column:2}}
+.pc{border:1px solid var(--line);border-radius:8px;padding:6px 10px;background:var(--surface)}
+.pc .ph{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px}
+.pc .pb{display:flex;flex-wrap:wrap;gap:3px;align-items:center;margin:6px 0 4px}
+.pc .pn{font-size:12px;color:var(--muted)}
+.gc{font:12px/16px var(--mono);padding:0 7px;border-radius:4px;border:1px solid var(--line);background:var(--soft);color:var(--muted)}
+.gc.on{background:var(--c);color:var(--surface);border-color:var(--c)}
+.v1 .pc+.pc{margin-top:0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<script id="portfolio-theme-sync">
+(function(){
+  function apply(){try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)}catch(e){}}
+  apply();window.addEventListener("storage",function(e){if(e.key==="theme")apply()});
+})();
+</script>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="toprow">
+      <h1>Life of a prompt</h1>
+      <div class="walk"><span class="count" id="count"></span><button class="btn" id="prev">Previous</button><button class="btn primary" id="next">Next step</button></div>
+    </div>
+  </header>
+  <div class="ask"><b>Example prompt</b><code>What is the capital of Bangladesh?</code></div>
+  <div id="steps"></div>
+  <p class="note">All numbers (token IDs, vectors, scores) are made up to show the idea. Real models use different values, and many more of them.</p>
+</div>
+<script>
+var OWN={client:{n:"Your app",c:"--client"},server:{n:"Inference server",c:"--server"},runtime:{n:"Inference runtime",c:"--runtime"},model:{n:"Model",c:"--model"}};
+var TOK=[["<|im_start|>",151644,1],["system",8948],["↵",198],["You",2610],["are",525],["a",264],["helpful",10950],["assistant",17847],[".",13],["<|im_end|>",151645,1],["↵",198],["<|im_start|>",151644,1],["user",872],["↵",198],["What",3838],["is",374],["the",279],["capital",6722],["of",315],["Bangladesh",29005],["?",30],["<|im_end|>",151645,1],["↵",198],["<|im_start|>",151644,1],["assistant",77091],["↵",198]];
+var PASS=[
+ {add:[],pick:0,cands:[[" Dhaka",11.0],[" Chittagong",7.5],[" The",6.8],[" Bangladesh",5.9]]},
+ {add:[[" Dhaka",56321]],pick:0,cands:[[".",9.0],[",",6.5],[" is",5.0],["!",3.0]]},
+ {add:[[" Dhaka",56321],[".",13]],pick:0,cands:[["<|im_end|>",12.0],["↵",6.0],[" The",4.0],[" It",3.5]]}
+];
+var S={open:0,pass:0,T:1,drawn:null,filter:null,qa:2,qt:false,cf:-1,embv:0,embt:1,embp:0,prec:0,picks:[null,null,null],tpl:0,tokfull:0,emb:2,att:0,ans:0};
+
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function sect(h,b){return '<div class="sec"><h4>'+h+'</h4>'+b+'</div>'}
+function strip(extra,hl){
+  var h='<div class="strip">';
+  TOK.forEach(function(t){h+='<span class="tok'+(t[2]?' s':'')+'">'+esc(t[0])+'<i>'+t[1]+'</i></span>'});
+  (extra||[]).forEach(function(t,i){h+='<span class="tok n">'+esc(t[0])+'<i>'+t[1]+'</i></span>'});
+  return h+'</div>';
+}
+function softmax(a,T){var m=Math.max.apply(null,a.map(function(x){return x[1]}));var e=a.map(function(x){return Math.exp((x[1]-m)/T)});var s=e.reduce(function(p,c){return p+c},0);return e.map(function(x){return x/s})}
+function bars(items,max,fmt,pickIdx){
+  return items.map(function(it,i){return '<div class="row'+(i===pickIdx?' pick':'')+'"><span>'+esc('"'+it[0]+'"')+'</span><span class="track"><span class="bar" style="display:block;width:'+Math.max(1,it[1]/max*100)+'%"></span></span><span class="v">'+fmt(it[1])+'</span></div>'}).join('');
+}
+function probsHTML(){
+  var p=PASS[S.pass],pr=softmax(p.cands,S.T);
+  var items=p.cands.map(function(c,i){return [c[0],pr[i]]});
+  var pk=S.picks[S.pass],h=bars(items,1,function(v){return (v*100).toFixed(1)+'%'},pk);
+  var cs=p.cands.map(function(c){return 'e^('+c[1].toFixed(1)+'÷'+S.T.toFixed(1)+')'});
+  h+='<div class="calc"><b>Calculation</b><span class="mono">P("'+esc(p.cands[0][0].trim())+'") = '+cs[0]+' ÷ ('+cs.join(' + ')+') = '+(pr[0]*100).toFixed(1)+'%</span> (top 4 shown; the real sum runs over all 100,000 tokens)</div>';
+  if(pk!==null)h+='<div class="res">Picked: <b>'+esc('"'+p.cands[pk][0]+'"')+'</b> (used in steps 11 and 12)</div>';
+  return h;
+}
+function passBand(){return '<div class="note">Showing pass '+(S.pass+1)+' of 3. Change the pass in the dashed loop header above.</div>'}
+
+var STEPS=[
+{o:"client",t:"You send the prompt",s:"Your app packs the text into a request",b:function(){return step1Visual()+'<details class="more"><summary>What and why</summary><ul class="kw"><li><b>What</b> text → HTTP request</li><li><b>Where</b> localhost:11434 (Ollama) · company API (cloud)</li><li><b>Why</b> one fixed format · any app talks to any server</li></ul></details>'}},
+{o:"server",t:"Check the request",s:"Is it valid, allowed, and within limits?",b:function(){return step2Visual()+'<details class="more"><summary>What and why</summary><ul class="kw"><li><b>What</b> 5 checks, in order</li><li><b>Fail</b> first failure stops it · error returned</li><li><b>Errors</b> 400 bad request · 401 bad key · 404 no model · 429 rate limit</li><li><b>Why</b> no GPU time wasted on abuse or bad input</li></ul></details>'}},
+{o:"server",t:"Queue the request",s:"Wait for a free slot",b:function(){return step3Visual()+'<details class="more"><summary>What and why</summary><ul class="kw"><li><b>What</b> limited slots · extra requests wait</li><li><b>Order</b> first in, first out</li><li><b>Why</b> avoids GPU memory overload · enables batching (step 6)</li><li><b>Too long</b> 503 server busy</li></ul></details>'}},
+{o:"server",t:"Apply the chat template",s:"Wrap the text in speaker markers",b:function(){
+  return '<div class="v1">'+seg("tpl",["ChatML","Llama 3","Gemma"],S.tpl)+'<pre class="tp">'+tplHTML(TPL[S.tpl].t)+'</pre></div>'+
+  kw([["What","system + user messages → one text with speaker markers"],["Cue","empty last turn = write the reply here"],["Varies","each model family has its own markers (Gemma has no system role)"],["Why","the model was trained on exactly this format"],["Where","server or runtime, depends on the tool"]])}},
+{o:"server",t:"Tokenize the text",s:"Text becomes a list of token IDs",b:function(){
+  var all=S.tokfull===1,arr=all?TOK:TOK.slice(14,21);
+  return '<div class="v1">'+seg("tokfull",["Question only (7 tokens)","Full template (26 tokens)"],S.tokfull)+tokChips(arr)+
+  '<div class="mono">['+arr.map(function(t){return t[1]}).join(", ")+']</div></div>'+
+  kw([["What","text → token IDs, one number per piece"],["Vocab","about 100,000 pieces in a fixed dictionary"],["Why","models read numbers only · rare words split into known pieces · same text, same IDs"],["Note","IDs here are made up · a real tokenizer may split Bangladesh in two"]])}},
+{o:"runtime",t:"Runtime prepares the run",s:"Weights are loaded, requests are batched",b:function(){
+  function node(k,t,sub){return '<div class="fn"><span class="num">'+k+'</span><div><h4>'+t+'</h4><p style="margin:0">'+sub+'</p></div></div>'}
+  var A='<div class="fa" aria-hidden="true">↓</div>';
+  return '<div class="fl">'+node(1,"Weights in GPU memory","the model file was loaded once, at startup")+A+node(2,"Batch","your request runs together with other waiting requests")+A+node(3,"Empty KV cache","space to remember earlier tokens, so later passes do not redo them")+A+node(4,"Ready","26 prompt tokens go into the token loop below")+'</div>'+
+  kw([["Pass","one run through steps 7 to 11 = one new token"],["Pass 1","reads the whole prompt, fills the KV cache"],["Next passes","add 1 token, compute only that one"],["Weights","model file loaded into GPU memory once, at startup"],["Batching","waiting requests run together"],["Why","speed and cost"]])}},
+{o:"model",t:"Embedding",s:"Each token ID becomes a vector of numbers",g:"loop",b:function(){
+  if(S.pass>0){
+    var nt=PASS[S.pass-1].cands[pickOf(S.pass-1)][0],nid=tid(nt),nn=nt.trim();
+    var hv=function(id){return nt===" Dhaka"?VEC.Dhaka:nt===" Bangladesh"?VEC.Bangladesh:[0,1,2,3].map(function(k){return Math.round(Math.sin(id*(k+1.7))*90)/100})};
+    var nvec=hv(nid),cached=26+S.pass-1;
+    var d2='<tr><td class="m">…</td><td>…</td><td class="m">…</td><td></td></tr>';
+    var tb='<table class="tbl"><tr><th>Row (= token ID)</th><th>Token</th><th>Numbers (first 4 of 4096)</th><th></th></tr>'+d2+'<tr class="cur"><td class="m">'+nid+'</td><td>'+nn+'</td><td class="m">'+vecTxt(nvec)+'</td><td>◀ used</td></tr>'+d2+'</table>';
+    var kc='<div class="strip">'+Array(cached+1).join('<span class="kc"></span>')+'<span class="kc on"></span></div>';
+    return passSeg()+'<div class="fl"><div class="fn"><span class="num">1</span><div><h4>Only the new token</h4><p>the token picked last pass: <b>"'+esc(nn)+'"</b> (ID '+nid+'). The other '+cached+' tokens were already embedded in earlier passes</p>'+tb+'</div></div><div class="fa" aria-hidden="true">↓ <small>copy its row</small></div><div class="fn"><span class="num">2</span><div><h4>Result: 1 new vector</h4><p>the '+cached+' older vectors are reused from the KV cache (step 6)</p>'+kc+'<div class="note" style="margin:6px 0 0">grey = reused, dark = new</div></div></div><div class="fa" aria-hidden="true">↓ <small>to step 8</small></div></div>'+kw([["Loop","each pass embeds only the token added last pass"],["Do","same lookup: ID → row → copy"],["Output","1 new vector, added after the cached ones"]])
+  }
+  var EV={"What":[0.12,0.33,-0.41,0.08],"is":[-0.05,0.21,0.17,-0.29],"the":[0.01,-0.08,0.15,0.02],"capital":VEC.capital,"of":[-0.03,0.12,0.06,-0.10],"Bangladesh":VEC.Bangladesh,"?":[0.02,-0.11,0.09,0.04]};
+  var Q=[["What",3838],["is",374],["the",279],["capital",6722],["of",315],["Bangladesh",29005],["?",30]];
+  var BY=Q.slice().sort(function(x,y){return x[1]-y[1]});
+  function node(n,t,sub,body){return '<div class="fn"><span class="num">'+n+'</span><div><h4>'+t+'</h4><p>'+sub+'</p>'+body+'</div></div>'}
+  var A=function(t){return '<div class="fa" aria-hidden="true">↓ <small>'+t+'</small></div>'};
+  var dots='<tr><td class="m">…</td><td>…</td><td class="m">…</td><td></td></tr>';
+  var big='<table class="tbl"><tr><th>Row (= token ID)</th><th>Token</th><th>Numbers (first 4 of 4096)</th><th></th></tr><tr><td class="m">0</td><td>!</td><td class="m">[…]</td><td></td></tr>'+dots+BY.map(function(r,i){return '<tr class="cur"><td class="m">'+r[1]+'</td><td>'+r[0]+'</td><td class="m">'+vecTxt(EV[r[0]])+'</td><td>◀ used</td></tr>'+(i<BY.length-1?dots:'')}).join('')+dots+'<tr><td class="m">99,999</td><td>…</td><td class="m">[…]</td><td></td></tr></table>';
+  var out='<table class="tbl"><tr><th>#</th><th>Token</th><th>ID</th><th>Vector copied from its row</th></tr>'+Q.map(function(r,i){return '<tr><td class="m">'+(i+1)+'</td><td>'+r[0]+'</td><td class="m">'+r[1]+'</td><td class="m">'+vecTxt(EV[r[0]])+'</td></tr>'}).join('')+'<tr><td class="m">…</td><td colspan="3">19 more for the template tokens (&lt;|im_start|&gt;, system, …)</td></tr></table>';
+  var tr='<details class="fn" style="display:block;margin-top:12px"><summary style="cursor:pointer;font-weight:600;font-size:14px">How did the table get its numbers? (training, done once, before release)</summary><p style="margin:8px 0">Every row starts random. The model guesses the next token on real text, and each miss nudges the rows involved. After billions of nudges, tokens used in similar sentences end up with close rows.</p><div class="qbar wait" style="margin:0 0 8px"><span class="qst"><label for="tr">Training progress <b id="trv">'+S.embp+'%</b></label> <input id="tr" type="range" min="0" max="100" step="5" value="'+S.embp+'"></span><span class="qbt"><button class="btn primary" id="trplay">▶ Train</button></span></div><div id="trt">'+trainHTML()+'</div></details>';
+  var h=passSeg()+'<div class="fl">'+
+  node(1,"Embedding table","saved in the model file: one row per token, row number = token ID. Each ID from step 5 picks its row",big)+A("copy the row for each ID")+
+  node(2,"Result: one vector per token","in prompt order · 26 tokens → 26 vectors (7 shown)",out)+A("to step 8")+
+  '<div class="note" style="margin:0 0 4px">Same token = same row every time. The layers in step 8 add the context.</div></div>';
+  return h+tr+kw([["Input","the 26 token IDs from step 5"],["Do","for each ID, copy that row, no calculation"],["Output","26 vectors, same order"],["Table","fixed, made once in training"]])}},
+{o:"model",t:"Transformer layers",s:"Tokens read each other to get context",g:"loop",b:function(){
+  var d=ATT[S.att],p0=S.pass===0,nt=p0?"":PASS[S.pass-1].cands[pickOf(S.pass-1)][0].trim();
+  var inp=p0?'<b>Input</b> 26 vectors from step 7, one per token, each 4,096 numbers (the picture shows the 7 words of your question)':'<b>Input</b> 1 new vector from step 7, for "'+esc(nt)+'". The 26+ older tokens are already in the KV cache';
+  var outp=p0?'<b>Output</b> 26 updated vectors, same size as the input but now with context. Only the last one is used: "?" went from <span class="mono">[+0.02, -0.11, +0.09, +0.04, …]</span> to <span class="mono">[+0.33, -0.60, +0.55, +0.15, …]</span>, close to the row for "Dhaka" → step 9':'<b>Output</b> 1 updated vector for "'+esc(nt)+'", same size as the input, now with context → step 9';
+  var calc='';
+  if(p0){
+    var R=[["Bangladesh",.34,VEC.Bangladesh],["capital",.30,VEC.capital],["?",.12,[0.02,-0.11,0.09,0.04]],["What",.08,[0.12,0.33,-0.41,0.08]],["user",.06,[0.05,0.20,-0.15,0.02]],["all others",.10,[0.00,0.05,0.10,-0.03]]];
+    var BD=[0.33,-0.60,0.55,0.15],sm=[0,0,0,0],rows='',f2=function(v){return (v>=0?'+':'')+v.toFixed(2)},vt=function(v){return '['+v.map(f2).join(', ')+']'};
+    R.forEach(function(r){var m=r[2].map(function(x){return x*r[1]});m.forEach(function(x,k){sm[k]+=x});rows+='<tr><td>'+r[0]+'</td><td class="m">× '+r[1].toFixed(2)+'</td><td class="m">'+vt(r[2])+'</td><td class="m">'+vt(m.map(function(x){return Math.round(x*100)/100}))+'</td></tr>'});
+    var sr=sm.map(function(x){return Math.round(x*100)/100}),dl=BD.map(function(x,k){return Math.round((x-sr[k])*100)/100});
+    var Q=[1.0,0.5],KK=[["Bangladesh",[2.22,1.0]],["capital",[2.14,0.8]],["?",[1.04,0.4]],["What",[0.52,0.3]],["user",[0.21,0.1]],["all others",[0.89,0.2]]],sc=KK.map(function(r){return (Q[0]*r[1][0]+Q[1]*r[1][1])/Math.SQRT2}),ex=sc.map(Math.exp),tot=ex.reduce(function(a,b){return a+b},0),wr='';
+    KK.forEach(function(r,i){wr+='<tr><td>'+r[0]+'</td><td class="m">['+r[1][0].toFixed(2)+', '+r[1][1].toFixed(2)+']</td><td class="m">'+sc[i].toFixed(2)+'</td><td class="m">'+ex[i].toFixed(2)+'</td><td class="m"><b>'+(ex[i]/tot).toFixed(2)+'</b></td></tr>'});
+    var wcalc='<div class="note" style="margin:6px 0 0"><b>Where the weights come from</b> (layer 1, one attention head, shortened to 2 numbers instead of 128)</div><div class="note" style="margin:0">The "?" vector × a learned matrix gives its <b>query</b> <span class="mono">q = [1.00, 0.50]</span>. Each token\'s vector × another learned matrix gives its <b>key</b>. Score = q · key ÷ √2, then softmax.</div><table class="tbl"><tr><th>Token</th><th>Key</th><th>Score = q·key ÷ √2</th><th>e^score</th><th>Weight = e^score ÷ '+tot.toFixed(2)+'</th></tr>'+wr+'</table>';
+    calc='<details class="more"><summary>Show the numbers</summary>'+wcalc+'<div class="note" style="margin:6px 0 0"><b>How the output for "?" is calculated</b> (layer 1, example numbers, first 4 of 4,096)</div>'+
+    '<table class="tbl"><tr><th>Token</th><th>Weight</th><th>Its vector</th><th>Weight × vector</th></tr>'+rows+'<tr class="cur"><td colspan="3"><b>1. Attention:</b> add them up</td><td class="m">'+vt(sr)+'</td></tr><tr><td colspan="3"><b>2. Feed-forward:</b> add what the learned weights know</td><td class="m">'+vt(dl)+'</td></tr><tr class="cur"><td colspan="3"><b>Output for "?" after this layer</b></td><td class="m">'+vt(BD)+'</td></tr></table>'+
+    '<div class="note" style="margin:0">Then layers 2 to 32 repeat the same two steps on this output.</div></details>';
+  }
+  var sh=function(t){return t==="<|im_start|>"?"<start>":t==="<|im_end|>"?"<end>":t};
+  function node(k,t,sub,body){return '<div class="fn"><span class="num">'+k+'</span><div><h4>'+t+'</h4><p>'+sub+'</p>'+body+'</div></div>'}
+  var A=function(t){return '<div class="fa" aria-hidden="true">↓ <small>'+t+'</small></div>'};
+  var Tx=function(x,y,t,sz,w,an,f){return '<text x="'+x+'" y="'+y+'" font-size="'+(sz||12)+'" font-weight="'+(w||400)+'" text-anchor="'+(an||'start')+'" dominant-baseline="central" fill="'+(f||'var(--ink)')+'">'+t+'</text>'};
+  var WT={19:.34,17:.30,20:.12,14:.08,12:.06};
+  function matrix(){
+    var c=15,x0=96,y0=22,o='',r,k,n=TOK.length;
+    for(r=0;r<n;r++){
+      o+=Tx(x0-6,y0+r*c+c/2,esc(sh(TOK[r][0])),10,r===20?700:400,'end',r===20?'#854F0B':'var(--muted)');
+      for(k=0;k<n;k++){
+        if(k<=r){var op=r===20?(WT[k]!==undefined?0.15+Math.min(.85,WT[k]*2.6):0.12):0.16;o+='<rect x="'+(x0+k*c)+'" y="'+(y0+r*c)+'" width="'+(c-1)+'" height="'+(c-1)+'" rx="2" fill="'+(r===20?'#EF9F27':'var(--c)')+'" opacity="'+op+'"/>'}
+        else o+='<rect x="'+(x0+k*c)+'" y="'+(y0+r*c)+'" width="'+(c-1)+'" height="'+(c-1)+'" rx="2" fill="none" stroke="var(--line)" stroke-width="0.5" stroke-dasharray="2 2"/>';
+      }
+    }
+    o+='<rect x="'+(x0-2)+'" y="'+(y0+20*c-1)+'" width="'+(21*c+3)+'" height="'+(c+1)+'" rx="3" fill="none" stroke="#854F0B" stroke-width="1.5"/>';
+    o+=Tx(x0,10,'each row = the token asking · each column = the token it looks at',11,400,'start','var(--muted)');
+    var X=x0+n*c+16,L=[['Filled: tokens it may look at',0],['Empty: later tokens,',1],['not allowed (looks left only)',1],['',0],['Outlined row = "?":',0],['darker = more weight',1],['Bangladesh 0.34',1],['capital 0.30',1],['"?" itself 0.12',1],['What 0.08, user 0.06',1],['all others 0.10 together',1]];
+    L.forEach(function(l,i){if(l[0])o+=Tx(X,y0+10+i*18,l[0],12,i===4?600:400,'start',l[1]?'var(--muted)':'var(--ink)')});
+    return '<svg viewBox="0 0 680 '+(y0+n*c+8)+'" width="100%" role="img" aria-label="Causal attention grid: each of 26 tokens looks only at itself and the tokens before it; the row for the question mark shows where it puts its weight">'+o+'</svg>'}
+  function rowSvg(){
+    var nc=26+S.pass-1,c=16,o='',k,x0=20;
+    for(k=0;k<=nc;k++){var op=k===19?1:k===17?.85:k===nc?.5:.14;o+='<rect x="'+(x0+k*c)+'" y="30" width="'+(c-2)+'" height="26" rx="3" fill="'+(k===nc?'#E1F5EE':'var(--c)')+'" stroke="'+(k===nc?'#0F6E56':'none')+'" opacity="'+(k===nc?1:op)+'"/>'}
+    o+=Tx(x0,12,'keys saved in the cache ('+nc+' tokens) + the new token\'s own key',12,400,'start','var(--muted)')+Tx(x0+nc*c+(c-2)/2,70,'new',11,600,'middle','#085041')+Tx(x0+19*c+7,70,'Bangladesh',11,400,'middle','var(--muted)')+Tx(x0+17*c+7,84,'capital',11,400,'middle','var(--muted)');
+    return '<svg viewBox="0 0 680 96" width="100%" role="img" aria-label="The new token compares its query with all saved keys">'+o+'</svg>'}
+  function mlpSvg(){
+    var o='',X=[150,340,530],I=[40,70,100,130],H=[34,49,64,79,94,109,124,139],act=[1,3,4,6],i,j;
+    for(i=0;i<4;i++)for(j=0;j<8;j++)o+='<line x1="'+X[0]+'" y1="'+I[i]+'" x2="'+X[1]+'" y2="'+H[j]+'" stroke="var(--line)" stroke-width="0.6"/><line x1="'+X[1]+'" y1="'+H[j]+'" x2="'+X[2]+'" y2="'+I[i]+'" stroke="var(--line)" stroke-width="0.6"/>';
+    I.forEach(function(y){o+='<circle cx="'+X[0]+'" cy="'+y+'" r="8" fill="var(--c)"/><circle cx="'+X[2]+'" cy="'+y+'" r="8" fill="var(--c)"/>'});
+    H.forEach(function(y,k){var on=act.indexOf(k)>=0;o+='<circle cx="'+X[1]+'" cy="'+y+'" r="6" fill="'+(on?'var(--c)':'var(--soft)')+'" stroke="var(--c)"/>'});
+    o+=Tx(245,12,'× W1 (widen)',12,600,'middle')+Tx(435,12,'× W2 (shrink)',12,600,'middle')+Tx(150,166,'4,096 numbers',12,400,'middle')+Tx(340,166,'about 14,000 numbers',12,400,'middle')+Tx(530,166,'4,096 numbers',12,400,'middle')+Tx(340,186,'filled = still positive; the rest are set to 0',12,400,'middle','var(--muted)');
+    return '<svg viewBox="0 0 680 198" width="100%" role="img" aria-label="Feed-forward network: widen, keep positive values, shrink">'+o+'</svg>'}
+  function strip(n,hot){var q='',k;for(k=0;k<n;k++)q+='<span class="kc'+(k===n-1&&hot?' on':'')+'"></span>';return '<div class="strip">'+q+'</div>'}
+  var N=p0?26:1,qkv='<div class="strip"><span class="tok">vector<i>from step 7</i></span><span class="tok">→ × W_Q<i>query q</i></span><span class="tok">→ × W_K<i>key k</i></span><span class="tok">→ × W_V<i>value v</i></span></div>';
+  var h=passSeg()+'<div class="fl">'+
+  node(1,"Make a query, key and value",(p0?"each of the 26 tokens turns":"the new token turns")+" its vector into three vectors",qkv+'<div class="note" style="margin:6px 0 0">query = what am I looking for · key = what do I contain · value = what I hand over. '+(p0?'26 queries, 26 keys, 26 values. The keys and values are saved in the KV cache.':'Its key and value are added to the cache.')+'</div>')+A("every token looks left")+
+  node(2,"Attention",p0?"each token compares its query with the keys it can see, turns the scores into weights (softmax) and blends the values":"the new token compares its query with all saved keys, softmax, then blends the values",(p0?matrix():rowSvg())+calc)+A("add the input back and normalize")+
+  node(3,"Feed-forward (MLP)",p0?"the same widen → keep positive → shrink network runs on each of the 26 vectors on its own":"the same network runs on the new vector",mlpSvg())+A("add the input back and normalize")+
+  node(4,"Repeat for layers 2 to 32","the "+(p0?"26 output vectors":"output vector")+" are the input of the next layer, which makes its own keys and values",'<div class="strip"><span class="tok">Layer 1<i>done</i></span><span class="tok">Layer 2<i>next</i></span><span class="tok">…<i></i></span><span class="tok">Layer 32<i>last</i></span></div>')+A("after layer 32")+
+  node(5,"Use only the last vector",p0?"26 vectors come out. Only the one for \"?\" goes on; the other 25 only matter through the cache":"1 vector comes out and it goes on",(p0?strip(26,true):strip(1,true))+'<div class="note" style="margin:6px 0 0">'+(p0?'The "?" vector went from <span class="mono">[+0.02, -0.11, +0.09, +0.04, …]</span> to <span class="mono">[+0.33, -0.60, +0.55, +0.15, …]</span>, close to the row for "Dhaka" → step 9':'New vector for "'+esc(nt)+'" → step 9')+'</div>')+'</div>';
+  return h+kw([["Loop","every pass sends the newest token through all layers → 1 new token → added to the end"],["Causal","looks left only, never at later tokens"],["Why","context sets meaning: capital city, letter or money"],["Learned","W_Q, W_K, W_V, W1, W2 are set in training"],["Example","weights and numbers shown are made up"]])}},
+{o:"model",t:"Logits",s:"One raw score for every possible next token",g:"loop",b:function(){
+  var p=PASS[S.pass];
+  return '<div class="v1">'+passSeg()+bars(p.cands,12,function(v){return v.toFixed(1)})+bar('about 100,000 scores in total (top 4 shown)','wait')+'</div>'+
+  kw([["What","last vector → one score per vocabulary token"],["Higher","model thinks it fits better"],["Raw","any size, not chances yet"],["Next","softmax (step 10)"]])}},
+{o:"runtime",t:"Softmax and sampling",s:"Scores become chances, then one token is picked",g:"loop",b:function(){
+  return '<div class="v1"><div class="qbar wait"><span class="qst">'+passSeg()+' <label for="temp">Temperature <b id="tv">'+S.T.toFixed(1)+'</b></label> <input id="temp" type="range" min="0.2" max="2" step="0.1" value="'+S.T+'"></span><span class="qbt"><button class="btn" id="greedy">Greedy</button><button class="btn primary" id="draw">Sample</button></span></div><div id="probs">'+probsHTML()+'</div></div>'+
+  kw([["Softmax","scores → chances that add up to 100%"],["Greedy","always the top token"],["Sample","random draw by chance · runs can differ"],["Temperature","low = predictable · high = varied"],["Top-k / top-p","drop unlikely tokens first"],["Live","computed over the 4 shown tokens"]])}},
+{o:"runtime",t:"Stop check, then loop",s:"Done? If not, add the token and go again",g:"loop",b:function(){
+  var picks=[];for(var q=0;q<=S.pass;q++)picks.push(PASS[q].cands[pickOf(q)][0]);var end=picks[picks.length-1]==="<|im_end|>";
+  var chips=picks.map(function(t,i){var e=t==="<|im_end|>";return [e?"<end>":t,tid(t),e?1:0]});
+  var gen=S.pass+1,pct=Math.max(2,gen/256*100);
+  return '<div class="v1">'+passSeg()+tokChips(chips,S.pass)+'<div class="row" style="grid-template-columns:110px 1fr 64px"><span>max_tokens</span><span class="track"><span class="bar" style="display:block;width:'+pct+'%"></span></span><span class="v">'+gen+' / 256</span></div>'+
+  bar(end?'<b>Stop</b> end token produced':'<b>Continue</b> token added → back to step 7',end?'go':'wait')+'</div>'+
+  kw([["Stop if","end token · max_tokens reached · stop string seen"],["Else","add the token to the input, run again"],["Why","1 pass = 1 token · max_tokens prevents endless output"]])}},
+{o:"server",t:"Detokenize and stream",s:"IDs back to text, sent as they appear",b:function(){
+  var g=genTokens(),chips=g.toks.map(function(t){return [t,tid(t)]});if(g.end)chips.push(["<end>",151645,1]);
+  return '<div class="v1">'+tokChips(chips)+'<div class="qbar wait"><span class="qst"><b>Output</b> <span class="mono" id="sout">'+esc(g.toks.join("").trim())+'</span></span><span class="qbt"><button class="btn primary" id="stream">▶ Play</button></span></div></div>'+
+  kw([["What","token IDs → text"],["From","tokens you picked in step 10 (top token by default)"],["End token","not shown"],["Stream","each piece sent as soon as it is made"],["Why","first words appear fast"]])}},
+{o:"client",t:"You see the answer",s:"The app shows the text",b:function(){
+  var a=ANS[S.ans],txt=a.slice(0,-1).map(function(t){return t[0]}).join("");
+  return '<div class="v1">'+seg("ans",["Short answer","Full sentence"],S.ans)+'<div class="bub" style="margin:0">'+esc(txt.trim())+'</div>'+tokChips(a)+bar('<b>'+a.length+' passes</b> through the token loop','go')+'</div>'+
+  kw([["Rule","1 token = 1 full pass of the loop"],["Cloud","load balancer + harness wrap all of this"],["Tools","harness runs the tool, adds the result, loops again"]])}}
+
+];
+
+function win(title,inner){return '<div class="win"><div class="wt"><i></i><i></i><i></i><span>'+title+'</span></div>'+inner+'</div>'}
+function step1Visual(){
+  var P='What is the capital of Bangladesh?';
+  var c=function(t){return '<span class="cm">// '+t+'</span>'};
+  var payload='<pre>{ <span class="jk">"model"</span>: <span class="js">"example-model"</span>,   '+c('which model')+'\n  <span class="jk">"messages"</span>: [{ <span class="jk">"role"</span>: <span class="js">"user"</span>, <span class="jk">"content"</span>: <span class="js">"'+P+'"</span> }],   '+c('your prompt')+'\n  <span class="jk">"max_tokens"</span>: <span class="jn">256</span>, <span class="jk">"temperature"</span>: <span class="jn">1.0</span>, <span class="jk">"stream"</span>: <span class="jb">true</span> }   '+c('options')+'</pre>';
+  return '<div class="v1">'+
+    '<div class="stg">1. You type the prompt</div>'+
+    '<div class="srcs">'+
+      win('Chat window','<div class="wb"><div class="bub">'+P+'</div></div>')+
+      win('Script','<pre class="wb code">answer = ask("'+P+'")</pre>')+
+      win('Terminal','<pre class="wb code">$ ollama run example-model "'+P+'"</pre>')+
+    '</div>'+
+    '<div class="stg">2. Your app builds the HTTP request from it</div>'+
+    '<div class="dt"><div class="dtt"><span class="on">Headers</span><span>Payload</span><span>Preview</span><span>Response</span></div>'+
+      '<div class="dts"><div class="kv"><b>Request URL</b><span>http://localhost:11434/v1/chat/completions</span></div>'+
+        '<div class="kv"><b>Method</b><span>POST '+c('send data to the server')+'</span></div>'+
+        '<div class="kv"><b>Content-Type</b><span>application/json '+c('the body is JSON')+'</span></div></div>'+
+      '<div class="dts"><h5>▼ Request Payload</h5>'+payload+'</div>'+
+    '</div>'+
+    '<div class="srv">3. Sent over the network to the inference server (next step)</div>'+
+  '</div>';
+}
+var SHORT=["Send prompt","Check request","Queue","Chat template","Tokenize","Prepare run","Embedding","Transformer","Logits","Sampling","Stop check","Stream out","Show answer"];
+function nd(i,x,y,w){
+  var st=STEPS[i];
+  return '<g class="nd" data-go="'+i+'" tabindex="0" role="button" aria-label="Step '+(i+1)+': '+SHORT[i]+'" style="--c:var('+OWN[st.o].c+')"><rect x="'+x+'" y="'+y+'" width="'+w+'" height="40" rx="8"/><circle cx="'+(x+17)+'" cy="'+(y+20)+'" r="11"/><text class="nn" x="'+(x+17)+'" y="'+(y+20)+'" dominant-baseline="central">'+(i+1)+'</text><text class="nl" x="'+(x+34)+'" y="'+(y+20)+'" dominant-baseline="central">'+SHORT[i]+'</text></g>';
+}
+function ar(d){return '<path class="ar" d="'+d+'" marker-end="url(#ah)"/>'}
+function bx(o,x,y,w,h,label,lx,ly){
+  return '<rect class="bx" style="--c:var('+OWN[o].c+')" x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="14"/><text class="bl" style="--c:var('+OWN[o].c+')" x="'+lx+'" y="'+ly+'">'+label+'</text>';
+}
+function overview(){
+  var g='';
+  g+=bx("client",40,8,600,70,"YOUR APP",624,26);
+  g+=bx("server",40,86,600,504,"INFERENCE SERVER",624,104);
+  g+=bx("runtime",60,186,560,316,"INFERENCE RUNTIME",604,204);
+  g+='<rect class="lp" x="80" y="286" width="520" height="190" rx="12"/><text class="lpl" x="584" y="304">TOKEN LOOP: REPEATS FOR EVERY TOKEN</text>';
+  g+=bx("model",100,316,480,86,"MODEL",564,332);
+  g+=bx("client",40,620,600,70,"YOUR APP",624,638);
+  g+=ar("M123 74 V116")+ar("M186 138 H204")+ar("M332 138 H350")+ar("M478 138 H496");
+  g+=ar("M561 158 V172 H189 V214");
+  g+=ar("M189 256 V346")+ar("M254 368 H272")+ar("M404 368 H422")+ar("M489 388 V418")+ar("M424 440 H256")+ar("M189 420 V390");
+  g+=ar("M189 460 V528")+ar("M189 570 V638");
+  g+='<text class="al" x="134" y="100">request goes in</text><text class="al" x="340" y="430" text-anchor="middle">not done yet</text><text class="al" x="200" y="494">end token: stop</text><text class="al" x="200" y="610">answer streams back</text>';
+  g+=nd(0,60,34,126)+nd(1,60,118,126)+nd(2,206,118,126)+nd(3,352,118,126)+nd(4,498,118,126);
+  g+=nd(5,124,216,130)+nd(6,124,348,130)+nd(7,274,348,130)+nd(8,424,348,130)+nd(9,424,420,130)+nd(10,124,420,130);
+  g+=nd(11,124,530,130)+nd(12,124,640,130);
+  return '<div class="ov"><h3>Bird\'s-eye view of the whole system</h3><p class="sub">Follow the arrows from top to bottom. Click any numbered step to jump to its details.</p><div class="dgw"><svg class="dg" viewBox="0 0 680 710" role="img" aria-label="Diagram of the whole system: your app sends a request into the inference server, which contains the inference runtime, which contains the model; the answer streams back to your app"><defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk" d="M1 1L9 5L1 9z"/></marker></defs>'+g+'</svg></div></div>';
+}
+var CHK=[
+ {n:"Format",ok:'valid JSON · "model", "messages"',bad:'"messages" missing',code:"400 Bad Request",msg:"Invalid request: messages is required",type:"invalid_request_error"},
+ {n:"Model",ok:'"example-model" found',bad:'"example-model" not found',code:"404 Not Found",msg:"Model example-model not found",type:"model_not_found"},
+ {n:"API key",ok:"cloud only · skipped here",bad:"key invalid",code:"401 Unauthorized",msg:"Invalid API key",type:"authentication_error",skip:true},
+ {n:"Rate limit",ok:"12 of 60 per minute",bad:"61 of 60 per minute",code:"429 Too Many Requests",msg:"Rate limit exceeded",type:"rate_limit_error"},
+ {n:"Limits",ok:"max_tokens 256 ≤ 4096",bad:"max_tokens 5000 > 4096",code:"400 Bad Request",msg:"max_tokens exceeds the allowed 4096",type:"invalid_request_error"}
+];
+function chkRow(i){
+  var c=CHK[i],f=S.cf,st,txt,val;
+  if(f<0||i<f){st=c.skip&&true?"skip":"ok";txt=c.skip?"skipped":"pass";val=c.ok}
+  else if(i===f){st="fail";txt="fail";val=c.bad}
+  else{st="idle";txt="not run";val=c.ok}
+  return '<div class="cr"><span class="ic">'+(i+1)+'</span><span><b>'+c.n+'</b> <small>'+val+'</small></span><span class="pill '+st+'">'+txt+'</span></div>';
+}
+function chkHTML(){var h="";for(var i=0;i<CHK.length;i++)h+=chkRow(i);return h}
+function chkBar(){
+  if(S.cf<0)return '<b>All passed</b> request moves on to the queue (next step)';
+  return '<b>Failed: '+CHK[S.cf].n+'</b> error returned · model never used';
+}
+function chkBtns(){return '<button class="btn primary" id="cfail">'+(S.cf<0?'Simulate failure':'Next failure')+'</button><button class="btn" id="creset" aria-label="Reset">↺ Reset</button>'}
+function chkErr(){
+  if(S.cf<0)return "";
+  var c=CHK[S.cf];
+  return '<div class="dt"><div class="dts"><div class="kv"><b>Status Code</b><span class="st2">● '+c.code+'</span></div><pre>{ <span class="jk">"error"</span>: { <span class="jk">"message"</span>: <span class="js">"'+c.msg+'"</span>, <span class="jk">"type"</span>: <span class="js">"'+c.type+'"</span> } }</pre></div></div>';
+}
+function step2Visual(){
+  return '<div class="v1"><div class="chk" id="cv">'+chkHTML()+'</div><div class="qbar '+(S.cf<0?'go':'bad')+'" id="cbar"><span class="qst" id="cs">'+chkBar()+'</span><span class="qbt" id="cb">'+chkBtns()+'</span></div><div id="ce">'+chkErr()+'</div></div>';
+}
+function cRefresh(){
+  var a=document.getElementById("cv");if(!a)return;
+  a.innerHTML=chkHTML();document.getElementById("cs").innerHTML=chkBar();document.getElementById("cb").innerHTML=chkBtns();
+  document.getElementById("cbar").className="qbar "+(S.cf<0?"go":"bad");document.getElementById("ce").innerHTML=chkErr();
+}
+var AHEAD=["Request B","Request A"];
+function queueHTML(){
+  var ahead=AHEAD.slice(0,S.qa),list=[{t:"Request D"}];
+  if(!S.qt)list.push({t:"Your prompt",me:true});
+  ahead.forEach(function(x){list.push({t:x})});
+  var total=list.length,h='<div class="qrow"><span class="ql">back</span>';
+  list.forEach(function(it,i){var pos=total-i;h+='<span class="qc'+(it.me?' me':'')+'">'+it.t+'<small>position '+pos+(pos===1?' (front)':'')+'</small></span>'});
+  return h+'<span class="ql">front</span></div>';
+}
+function qState(){return S.qt?"go":(S.qa===0?"front":"wait")}
+function slotHTML(){
+  if(S.qt)return '<b>Slot opened</b> your prompt moves on to the chat template (next step)';
+  if(S.qa===0)return '<b>Front of the line</b> waiting for a slot';
+  return '<b>All slots busy</b> your position: '+(S.qa+1);
+}
+function queueBtns(){
+  return '<button class="btn primary" id="qnext"'+(S.qt?' disabled':'')+'>Free a slot</button><button class="btn" id="qreset" aria-label="Start over">↺ Reset</button>';
+}
+function step3Visual(){
+  return '<div class="v1"><div id="qv">'+queueHTML()+'</div><div class="qbar '+qState()+'" id="qbar"><span class="qst" id="qs">'+slotHTML()+'</span><span class="qbt" id="qb">'+queueBtns()+'</span></div></div>';
+}
+function qRefresh(){var a=document.getElementById("qv");if(a){a.innerHTML=queueHTML();document.getElementById("qs").innerHTML=slotHTML();document.getElementById("qb").innerHTML=queueBtns();document.getElementById("qbar").className="qbar "+qState()}}
+function seg(key,labels,cur){return '<span class="seg">'+labels.map(function(l,i){return '<button class="sb" data-seg="'+key+'" data-v="'+i+'" aria-pressed="'+(cur===i)+'">'+l+'</button>'}).join('')+'</span>'}
+function passSeg(){return '<span class="pl">Pass '+(S.pass+1)+'</span>'}
+function endPass(){for(var i=0;i<3;i++){if(PASS[i].cands[pickOf(i)][0]==="<|im_end|>")return i}return 2}
+function nav(d){
+  if(d>0){if(S.open===10&&S.pass<endPass()){S.pass++;S.open=6}else S.open=Math.min(S.open+1,STEPS.length-1)}
+  else{if(S.open===6&&S.pass>0){S.pass--;S.open=10}else{if(S.open===11)S.pass=endPass();S.open=Math.max(S.open-1,0)}}
+  S.drawn=null;go(S.open,true)}
+function kw(rows){return '<details class="more"><summary>What and why</summary><ul class="kw">'+rows.map(function(r){return '<li><b>'+r[0]+'</b> '+r[1]+'</li>'}).join('')+'</ul></details>'}
+function tokChips(arr,newFrom){return '<div class="strip">'+arr.map(function(t,i){return '<span class="tok'+(t[2]?' s':'')+(newFrom!==undefined&&i>=newFrom?' n':'')+'">'+esc(t[0])+'<i>'+t[1]+'</i></span>'}).join('')+'</div>'}
+function bar(html,cls,btns){return '<div class="qbar '+cls+'"><span class="qst">'+html+'</span><span class="qbt">'+(btns||'')+'</span></div>'}
+var TPL=[
+ {t:"<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\nWhat is the capital of Bangladesh?<|im_end|>\n<|im_start|>assistant\n"},
+ {t:"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nYou are a helpful assistant.<|eot_id|><|start_header_id|>user<|end_header_id|>\n\nWhat is the capital of Bangladesh?<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"},
+ {t:"<bos><start_of_turn>user\nYou are a helpful assistant.\n\nWhat is the capital of Bangladesh?<end_of_turn>\n<start_of_turn>model\n"}
+];
+function tplHTML(t){return esc(t).replace(/(&lt;.*?&gt;)/g,'<span class="sp">$1</span>')}
+var VEC={capital:[0.42,-0.11,0.87,0.05],Bangladesh:[0.31,-0.72,0.58,0.09],Dhaka:[0.29,-0.65,0.61,0.11],banana:[-0.80,0.40,-0.20,0.70]};
+var VNAMES=["capital","Bangladesh","Dhaka","banana"];
+function cosine(a,b){var d=0,x=0,y=0;for(var i=0;i<a.length;i++){d+=a[i]*b[i];x+=a[i]*a[i];y+=b[i]*b[i]}return d/Math.sqrt(x*y)}
+var ATT=[
+ [["Bangladesh",.34],["capital",.30],["?",.12],["What",.08],["user",.06],["all others",.10]],
+ [["capital",.38],["Bangladesh (itself)",.28],["of",.20],["the",.08],["What",.06]],
+ [["capital (itself)",.34],["What",.32],["the",.22],["is",.12]]
+];
+var ANS=[
+ [[" Dhaka",56321],[".",13],["<end>",151645,1]],
+ [["The",791],[" capital",6864],[" of",315],[" Bangladesh",29005],[" is",374],[" Dhaka",56321],[".",13],["<end>",151645,1]]
+];
+var TID={" Dhaka":56321,".":13,"<|im_end|>":151645," Chittagong":43877," The":578," Bangladesh":29005,",":11," is":374,"!":0,"↵":198," It":1102};
+function tid(t){return TID[t]===undefined?0:TID[t]}
+function pickOf(i){return S.picks[i]===null?0:S.picks[i]}
+function genTokens(){var r=[],end=false;for(var i=0;i<3;i++){var t=PASS[i].cands[pickOf(i)][0];if(t==="<|im_end|>"){end=true;break}r.push(t)}return {toks:r,end:end}}
+var RAND={capital:[-0.6,0.5,-0.2,0.7],Bangladesh:[0.7,0.2,-0.5,-0.3],Dhaka:[-0.1,-0.8,0.6,0.3],banana:[0.4,-0.1,0.7,-0.6]};
+var EID={capital:6722,Bangladesh:29005,Dhaka:56321,banana:41234};
+function vecTxt(v){return '['+v.map(function(x){return (x>0?'+':'')+x.toFixed(2)}).join(', ')+']'}
+function interp(n,t){return VEC[n].map(function(x,i){return RAND[n][i]+(x-RAND[n][i])*t})}
+function trainHTML(){
+  var t=S.embp/100,vb=interp("Bangladesh",t),rows='';
+  ["Bangladesh","Dhaka","capital","banana"].forEach(function(n){var v=interp(n,t),c=cosine(v,vb);rows+='<tr><td>'+n+'</td><td class="m">'+vecTxt(v)+'</td><td class="m">'+(n==="Bangladesh"?'–':c.toFixed(2))+'</td></tr>'});
+  var cd=cosine(interp("Dhaka",t),vb);
+  return '<table class="tbl"><tr><th>Token</th><th>Its row of numbers</th><th>Similarity to Bangladesh</th></tr>'+rows+'</table>'+bar(S.embp===0?'<b>Start</b> random numbers · Dhaka vs Bangladesh = '+cd.toFixed(2):(S.embp===100?'<b>Trained</b> Dhaka is close to Bangladesh ('+cd.toFixed(2)+'), banana is not':'<b>Training</b> rows are moving · Dhaka vs Bangladesh = '+cd.toFixed(2)),S.embp===100?'go':'wait');
+}
+function trainRefresh(){var a=document.getElementById("trt");if(a){a.innerHTML=trainHTML();document.getElementById("trv").textContent=S.embp+"%";document.getElementById("tr").value=S.embp}}
+var BANK={e:[0.50,0.10,-0.30,0.40],river:[0.62,-0.35,-0.10,0.55],money:[0.10,0.60,0.45,0.20]};
+var embTimer=null;
+function layersSVG(){
+  var P=["What","is","the","capital","of","Bangladesh","?"],gen=[],i,o='';
+  for(i=0;i<S.pass;i++)gen.push(PASS[i].cands[pickOf(i)][0].trim());
+  var all=P.concat(gen),n=all.length,last=n-1,X=function(k){return 20+71*k},C=function(k){return X(k)+34};
+  var out=PASS[S.pass].cands[pickOf(S.pass)][0],end=out==="<|im_end|>",outT=end?"<end>":out.trim();
+  var ARC=[[[5,4,1],[3,2.5,.7],[4,1.2,.3],[1,1,.25]],[[5,3,.8],[3,2.5,.7],[6,1.2,.3],[0,1,.25]],[[7,4,1],[5,2,.6],[6,1.2,.3],[3,1,.25]]][S.pass];
+  all.forEach(function(t,k){var g=k>=7,l=k===last;o+='<rect x="'+X(k)+'" y="332" width="68" height="34" rx="6" fill="'+(g?'#E1F5EE':l?'#FAEEDA':'var(--soft)')+'" stroke="'+(g?'#0F6E56':l?'#854F0B':'var(--line)')+'"/><text x="'+C(k)+'" y="349" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="'+(l?600:400)+'" fill="'+(g?'#085041':l?'#633806':'var(--ink)')+'">'+t+'</text>'});
+  function slab(y,a){return '<rect x="20" y="'+y+'" width="640" height="28" rx="6" fill="var(--soft)" stroke="var(--c)" stroke-width="1.5"/><text x="34" y="'+(y+14)+'" dominant-baseline="central" font-size="13" font-weight="600" fill="var(--ink)">'+a+'</text><text x="110" y="'+(y+14)+'" dominant-baseline="central" font-size="12" fill="var(--muted)">attention + feed-forward</text>'}
+  var arcs='';
+  ARC.forEach(function(a){var d=Math.abs(C(last)-C(a[0])),cy=314-d*.19;arcs+='<path d="M'+C(last)+' 328 Q'+((C(last)+C(a[0]))/2)+' '+cy+' '+C(a[0])+' 328" stroke-width="'+a[1]+'" opacity="'+a[2]+'"/>'});
+  var bx=Math.min(520,C(last)-70);
+  var top='<rect x="'+bx+'" y="40" width="140" height="40" rx="8" fill="'+(end?'#F1EFE8':'#E1F5EE')+'" stroke="'+(end?'#5F5E5A':'#0F6E56')+'"/><text x="'+(bx+70)+'" y="60" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="600" fill="'+(end?'#444441':'#085041')+'">'+(end?'Logits → &lt;end&gt;':'Logits → '+outT)+'</text><line x1="'+C(last)+'" y1="148" x2="'+C(last)+'" y2="86" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#lah)"/>';
+  var loop='';
+  var cap='Pass '+(S.pass+1)+': the last token\'s vector goes through every layer and looks back at the earlier tokens';
+  return '<svg class="lay" viewBox="0 0 680 410" width="100%" role="img" aria-label="Pass '+(S.pass+1)+': '+n+' tokens go through all layers and one new token comes out"><defs><marker id="lah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round"/></marker></defs>'+
+  top+'<text x="20" y="60" font-size="12" fill="var(--muted)">Step 8 is one stop in the loop</text>'+
+  slab(150,"Layer 32")+'<text x="340" y="205" text-anchor="middle" font-size="12" fill="var(--muted)">Layers 2 to 31: same two steps, repeated</text>'+slab(232,"Layer 1")+
+  '<g fill="none" stroke="#EF9F27" stroke-linecap="round">'+arcs+'</g>'+o+loop+
+  '<text x="340" y="392" text-anchor="middle" font-size="12" fill="var(--muted)">'+cap+'</text></svg>'}
+function loopSVG(){
+  var n=7+S.pass,out=PASS[S.pass].cands[pickOf(S.pass)][0],end=out==="<|im_end|>",outT=end?"<end>":out.trim();
+  var B=[[6,"Embedding",S.pass?"1 new vector":"26 vectors","model"],[7,"Layers",S.pass?"1 new + cache":"26 vectors","model"],[8,"Logits","100,000 scores","model"],[9,"Sample",end?"&lt;end&gt;":outT,"runtime"],[10,"Stop check",end?"end: stop":"not done","runtime"]],o='';
+  B.forEach(function(b,k){var x=20+132*k,c='var('+OWN[b[3]].c+')';
+    o+='<g><rect x="'+x+'" y="44" width="112" height="56" rx="8" fill="'+(S.open===b[0]?'var(--surface)':'var(--soft)')+'" stroke="'+c+'" stroke-width="'+(S.open===b[0]?3:1.5)+'"/><text x="'+(x+56)+'" y="62" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="600" fill="var(--ink)">'+(b[0]+1)+' '+b[1]+'</text><text x="'+(x+56)+'" y="83" text-anchor="middle" dominant-baseline="central" font-size="12" fill="var(--muted)">'+b[2]+'</text></g>';
+    if(k<4)o+='<line x1="'+(x+114)+'" y1="72" x2="'+(x+130)+'" y2="72" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#lph)"/>'});
+  var back=end?'<path d="M604 102 V140 H76 V104" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="3 4" opacity=".5"/>':'<path d="M604 102 V140 H76 V106" fill="none" stroke="var(--runtime)" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#lph)"/>';
+  return '<svg viewBox="0 0 680 176" width="100%" role="img" aria-label="Loop: embedding, layers, logits, sample, stop check, then back to embedding with the new token added"><defs><marker id="lph" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round"/></marker></defs><text x="20" y="22" font-size="13" font-weight="600" fill="var(--ink)">Pass '+(S.pass+1)+': '+n+' tokens in</text><text x="660" y="22" text-anchor="end" font-size="12" fill="var(--muted)"></text>'+o+back+'<text x="340" y="162" text-anchor="middle" font-size="12" fill="var(--muted)">'+(end?'End token: the loop stops here':'Add "'+outT+'" to the end, embed it, go again')+'</text></svg>'}
+function layerDiagram(){
+  var W=[["Bangladesh",.34],["capital",.30],["?",.12],["What",.08],["user",.06],["others",.10]],o='',i,j;
+  var T=function(x,y,t,sz,w,a,f){return '<text x="'+x+'" y="'+y+'" font-size="'+(sz||12)+'" font-weight="'+(w||400)+'" text-anchor="'+(a||'start')+'" dominant-baseline="central" fill="'+(f||'var(--ink)')+'">'+t+'</text>'};
+  var Bx=function(x,y,w,h,st,fl){return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="8" fill="'+(fl||'var(--soft)')+'" stroke="'+(st||'var(--line)')+'" stroke-width="1.2"/>'};
+  var Ar=function(x1,y1,x2,y2){return '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ldh)"/>'};
+  o+=Bx(20,8,640,36)+T(340,26,'Input: the vector for "?" (and the vectors of the earlier tokens)',13,600,'middle');
+  o+=Ar(340,46,340,64);
+  o+=Bx(20,64,640,192,'var(--c)','var(--surface)')+T(36,82,'1  ATTENTION',13,600)+T(150,82,'mixes information between tokens',12,400,'start','var(--muted)');
+  var st=[["Query and keys","× W_Q and × W_K"],["Scores","q · key ÷ √d"],["Softmax","scores → weights"],["Blend","Σ weight × value"]];
+  st.forEach(function(a,k){var x=36+156*k;o+=Bx(x,96,140,46)+T(x+70,111,a[0],13,600,'middle')+T(x+70,129,a[1],12,400,'middle','var(--muted)');if(k<3)o+=Ar(x+142,119,x+154,119)});
+  o+=T(36,160,'Attention weights for "?" (the bars you saw above):',12,400,'start','var(--muted)');
+  W.forEach(function(w,k){var x=40+98*k,h=Math.round(w[1]*110);o+='<rect x="'+x+'" y="'+(232-h)+'" width="70" height="'+h+'" rx="4" fill="var(--c)" opacity="'+(0.35+w[1])+'"/>'+T(x+35,232-h-8,w[1].toFixed(2),12,600,'middle')+T(x+35,246,w[0],11,400,'middle','var(--muted)')});
+  o+=Ar(340,258,340,288)+T(352,273,'add the input back, then normalize',12,400,'start','var(--muted)');
+  o+=Bx(20,290,640,214,'var(--c)','var(--surface)')+T(36,308,'2  FEED-FORWARD (an MLP)',13,600)+T(250,308,'works on each token on its own, same weights for every token',12,400,'start','var(--muted)');
+  var X=[140,340,540],ys=function(n,y0,gap){var a=[];for(var q=0;q<n;q++)a.push(y0+q*gap);return a},I=ys(4,350,30),H=ys(8,340,15),act=[1,3,4,6];
+  for(i=0;i<4;i++)for(j=0;j<8;j++)o+='<line x1="'+X[0]+'" y1="'+I[i]+'" x2="'+X[1]+'" y2="'+H[j]+'" stroke="var(--line)" stroke-width="0.6"/>';
+  for(j=0;j<8;j++)for(i=0;i<4;i++)o+='<line x1="'+X[1]+'" y1="'+H[j]+'" x2="'+X[2]+'" y2="'+I[i]+'" stroke="var(--line)" stroke-width="0.6"/>';
+  I.forEach(function(y){o+='<circle cx="'+X[0]+'" cy="'+y+'" r="8" fill="var(--c)"/><circle cx="'+X[2]+'" cy="'+y+'" r="8" fill="var(--c)"/>'});
+  H.forEach(function(y,k){var on=act.indexOf(k)>=0;o+='<circle cx="'+X[1]+'" cy="'+y+'" r="6" fill="'+(on?'var(--c)':'var(--soft)')+'" stroke="var(--c)" stroke-width="1"/>'});
+  o+=T(240,326,'× W1 (widen)',12,600,'middle')+T(440,326,'× W2 (shrink)',12,600,'middle');
+  o+=T(140,466,'4,096 numbers',12,400,'middle')+T(340,466,'about 14,000 numbers',12,400,'middle')+T(540,466,'4,096 numbers',12,400,'middle');
+  o+=T(340,485,'filled = still positive; the rest are set to 0 (the non-linear step)',12,400,'middle','var(--muted)');
+  o+=Ar(340,506,340,530)+T(352,518,'add the input back, then normalize',12,400,'start','var(--muted)');
+  o+=Bx(20,532,640,36,'var(--c)')+T(340,550,'Output: new vector for "?" → the next layer (layers 2 to 32 repeat this)',13,600,'middle');
+  return '<svg viewBox="0 0 680 580" width="100%" role="img" aria-label="Inside one layer: attention mixes the tokens, then the feed-forward network processes each token, with the input added back after each part"><defs><marker id="ldh" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round"/></marker></defs>'+o+'</svg>'}
+var root=document.getElementById("steps");
+var NOTE={client:"",server:"contains the runtime, which contains the model",runtime:"part of the server, runs the model on the hardware",model:"loaded inside the runtime"};
+function stepHTML(i){
+  var st=STEPS[i];
+  return '<section class="step" id="st'+i+'" style="--c:var('+OWN[st.o].c+')" data-o="'+st.o+'"><div class="sh" data-i="'+i+'"><span class="num">'+(i+1)+'</span><span><span class="st">'+st.t+'</span><span class="ss">'+st.s+'</span></span></div><div class="body" id="b'+i+'"></div></section>';
+}
+function steps(a,b){var h="";for(var i=a;i<=b;i++)h+=stepHTML(i);return h}
+function box(o,inner){
+  return '<div class="grp" style="--c:var('+OWN[o].c+')"><div class="gl">'+OWN[o].n+(NOTE[o]?'<small>'+NOTE[o]+'</small>':'')+'</div>'+inner+'</div>';
+}
+function build(){
+  var loop='<div class="loop"><div class="loophead"><strong>Token loop</strong><span>Repeats once per generated token. Now: <b id="pnow"></b></span></div>'+box("model",steps(6,8))+steps(9,10)+'<div class="loopback">↩ Back to step 7 with the new token added, until a stop rule hits</div></div>';
+  var runtime=box("runtime",steps(5,5)+loop);
+  var server=box("server",steps(1,4)+runtime+steps(11,11));
+  var h=overview()+box("client",steps(0,0))+server+box("client",steps(12,12));
+  root.innerHTML=h;
+}
+var CALC=[
+ function(){var t="What is the capital of Bangladesh?",b=JSON.stringify({model:"example-model",messages:[{role:"user",content:t}],max_tokens:256,temperature:1,stream:true});return '<span class="mono">"'+t+'" = '+t.length+' characters → whole JSON body = '+b.length+' bytes</span>'},
+ function(){return '<span class="mono">12 &lt; 60 requests/min ✓ · 256 ≤ 4,096 max tokens ✓ · all checks pass → accepted</span>'},
+ function(){return '<span class="mono">your position 3 → 2 requests ahead × about 1 s per slot ≈ 2 s wait</span> (example start)'},
+ function(){return '<span class="mono">your text: 34 characters → after the template: '+TPL[S.tpl].t.length+' characters</span> (speaker markers added around it)'},
+ function(){return '<span class="mono">"Bangladesh" → vocabulary lookup → ID 29005 · '+TOK.length+' pieces → '+TOK.length+' IDs</span>'},
+ function(){return '<span class="mono">8 billion numbers × 2 bytes (16-bit) = 16 GB of weights in GPU memory</span> (example model size)'},
+ function(){var nt=S.pass?PASS[S.pass-1].cands[pickOf(S.pass-1)][0]:" capital",id=S.pass?tid(nt):6722;return '<span class="mono">"'+esc(nt.trim())+'" = ID '+id+' → byte offset = '+id+' × 4,096 numbers × 2 bytes = '+(id*4096*2).toLocaleString("en-US")+' → read the next 8,192 bytes (one row)</span>'},
+ function(){return ''},
+ function(){return S.pass?'<span class="mono">score(token) = last vector · that token\'s row, repeated for all 100,000 tokens</span>':'<span class="mono">score("Dhaka") = 0.33×0.29 + (−0.60)×(−0.65) + 0.55×0.61 + 0.15×0.11 = 0.84 so far, + 4,092 more terms → 11.0</span> (last vector · the row for "Dhaka")'},
+ function(){return ''},
+ function(){var out=PASS[S.pass].cands[pickOf(S.pass)][0],e=out==="<|im_end|>";return '<span class="mono">generated '+(S.pass+1)+' of 256 → '+(S.pass+1)+' &lt; 256 '+(e?'but the end token appeared → stop':'and no end token → continue')+'</span>'},
+ function(){var g=genTokens();return '<span class="mono">IDs ['+g.toks.map(tid).join(", ")+'] → pieces '+g.toks.map(function(t){return '"'+esc(t)+'"'}).join(" + ")+' → text "'+esc(g.toks.join("").trim())+'"</span>'},
+ function(){var n=ANS[S.ans].length;return '<span class="mono">'+n+' passes ÷ 30 tokens per second ≈ '+(n/30).toFixed(1)+' s</span> (example speed)'}
+];
+function paint(){
+  STEPS.forEach(function(st,i){
+    var el=document.getElementById("st"+i),btn=el.querySelector(".sh"),body=document.getElementById("b"+i);
+    el.classList.toggle("open",S.open===i);
+    var html=st.b(),cx=CALC[i]?CALC[i]():"";
+    if(cx){cx='<div class="calc"><b>Calculation</b>'+cx+'</div>';var k=html.lastIndexOf('<details class="more">');html=k>=0?html.slice(0,k)+cx+html.slice(k):html+cx}
+    body.innerHTML=html;
+  });
+  var pn=document.getElementById("pnow");if(pn)pn.textContent="pass "+(S.pass+1)+" of "+(endPass()+1);
+  document.getElementById("next").textContent=(S.open===10&&S.pass<endPass())?"Back to step 7":"Next step";
+  
+  document.querySelectorAll("[data-pass]").forEach(function(b){b.setAttribute("aria-pressed",String(+b.dataset.pass===S.pass))});
+  var ep=endPass(),tot=6+(ep+1)*5+2,i=S.open,pos=i<6?i+1:(i<=10?6+S.pass*5+(i-5):6+(ep+1)*5+(i-10));
+  document.getElementById("count").innerHTML="Step "+pos+" of "+tot+(i>=6&&i<=10?' <small style="color:var(--muted)">(card '+(i+1)+', pass '+(S.pass+1)+')</small>':'');
+  document.getElementById("prev").disabled=S.open===0;
+  document.getElementById("next").disabled=S.open===STEPS.length-1;
+}
+function go(i,scroll){S.open=i;paint();if(scroll){var e=document.getElementById("st"+i);try{e.scrollIntoView({behavior:"smooth",block:"nearest"})}catch(x){e.scrollIntoView()}}}
+var timer=null;
+document.addEventListener("click",function(e){
+  var t=e.target;
+  if(t.id==="cfail"){S.cf=(S.cf+1)%CHK.length;cRefresh();return}
+  if(t.id==="creset"){S.cf=-1;cRefresh();return}
+  if(t.id==="qnext"){if(S.qa>0){S.qa--}else{S.qt=true}qRefresh();return}
+  if(t.id==="qreset"){S.qa=2;S.qt=false;qRefresh();return}
+  var og=t.closest("[data-go]");if(og){go(+og.dataset.go,true);return}
+  var sg=t.closest("[data-seg]");if(sg){S[sg.dataset.seg]=+sg.dataset.v;paint();return}
+  var pb=t.closest("[data-pass]");if(pb){S.pass=+pb.dataset.pass;S.drawn=null;paint();return}
+  if(t.id==="next"){nav(1);return}
+  if(t.id==="prev"){nav(-1);return}
+  if(t.id==="trplay"){clearInterval(embTimer);S.embp=0;trainRefresh();embTimer=setInterval(function(){S.embp=Math.min(100,S.embp+5);trainRefresh();if(S.embp>=100)clearInterval(embTimer)},120);return}
+  if(t.id==="pnext"){nav(1);return}
+  if(t.id==="greedy"){S.picks[S.pass]=0;document.getElementById("probs").innerHTML=probsHTML();return}
+  if(t.id==="draw"){var pr=softmax(PASS[S.pass].cands,S.T),r=Math.random(),a=0,k=0;for(var j=0;j<pr.length;j++){a+=pr[j];if(r<=a){k=j;break}k=j}S.picks[S.pass]=k;document.getElementById("probs").innerHTML=probsHTML();return}
+  if(t.id==="stream"){var out=document.getElementById("sout"),parts=genTokens().toks,n=0;out.textContent="";clearInterval(timer);timer=setInterval(function(){if(n<parts.length){out.textContent+=parts[n++]}else{clearInterval(timer)}},600);return}
+});
+document.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){var g=e.target.closest&&e.target.closest("[data-go]");if(g){e.preventDefault();go(+g.dataset.go,true)}}});
+document.addEventListener("input",function(e){
+  if(e.target.id==="tr"){S.embp=parseInt(e.target.value,10);trainRefresh()}
+  if(e.target.id==="temp"){S.T=parseFloat(e.target.value);S.picks[S.pass]=null;document.getElementById("tv").textContent=S.T.toFixed(1);document.getElementById("probs").innerHTML=probsHTML()}
+});
+build();paint();
+</script>
+</body>
+</html>

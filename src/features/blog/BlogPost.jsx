@@ -13,7 +13,9 @@ export default function BlogPost() {
 
   return (
     <div className="min-h-screen pb-20 pt-10">
-      <div className="mx-auto max-w-[720px] px-8 max-[480px]:px-5">
+      <div
+        className={`mx-auto px-8 max-[480px]:px-5 ${blog.embed ? "max-w-[960px]" : "max-w-[720px]"}`}
+      >
         <Link
           to="/blog"
           className="mb-10 inline-block text-[0.8rem] text-[var(--text3)] transition-colors hover:text-[var(--accent)]"
@@ -23,11 +25,20 @@ export default function BlogPost() {
 
         <BlogPostHeader blog={blog} />
 
-        <article className="leading-[1.8]">
-          <ReactMarkdown components={markdownComponents}>
-            {blog.content}
-          </ReactMarkdown>
-        </article>
+        {blog.embed ? (
+          <iframe
+            src={blog.embed}
+            title={blog.title}
+            loading="lazy"
+            className="h-[85vh] w-full rounded-xl border border-border"
+          />
+        ) : (
+          <article className="leading-[1.8]">
+            <ReactMarkdown components={markdownComponents}>
+              {blog.content}
+            </ReactMarkdown>
+          </article>
+        )}
 
         <div className="mt-20 border-t border-border pt-8">
           <Link

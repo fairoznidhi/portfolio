@@ -1,5 +1,14 @@
 export const blogs = [
   {
+    id: "life-of-a-prompt",
+    title: "Life of a Prompt",
+    subtitle: "What happens from the moment you press Enter until an LLM's answer appears: server, tokenizer, embeddings, transformer layers, sampling and the token loop",
+    date: "2026-11-20",
+    readTime: "Interactive · 15 min",
+    tags: ["LLM", "Inference", "Transformers"],
+    embed: "/blog-embeds/life-of-a-prompt.html",
+  },
+  {
     id: "http-versions",
     title: "HTTP 0.9 vs 1.0 vs 1.1 vs 2 vs 3",
     subtitle: "A deep dive into how HTTP evolved from a one-liner to a multiplexed binary protocol",
