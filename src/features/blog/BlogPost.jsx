@@ -11,6 +11,26 @@ export default function BlogPost() {
 
   if (!blog) return <Navigate to="/blog" replace />;
 
+  if (blog.embed) {
+    return (
+      <div className="fixed inset-x-0 bottom-0 top-[var(--nav-h)] z-50 flex flex-col bg-[var(--bg)]">
+        <div className="flex h-9 shrink-0 items-center border-b border-border px-5">
+          <Link
+            to="/blog"
+            className="text-[0.8rem] text-[var(--text3)] transition-colors hover:text-[var(--accent)]"
+          >
+            <ArrowLeft size={13} strokeWidth={2} /> All posts
+          </Link>
+        </div>
+        <iframe
+          src={blog.embed}
+          title={blog.title}
+          className="min-h-0 w-full flex-1 border-0"
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen pb-20 pt-10">
       <div
