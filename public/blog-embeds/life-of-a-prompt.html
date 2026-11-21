@@ -151,19 +151,18 @@ pre{margin:6px 0 0;padding:10px 12px;background:var(--soft);border-radius:8px;ov
 .ov h3{margin:0 0 2px;font-size:16px;font-weight:600}
 .ov .sub{margin:0 0 10px;color:var(--muted);font-size:13px}
 .dgw{overflow-x:auto}
-.dg{display:block;width:100%;min-width:560px;height:auto}
+.dg{display:block;width:100%;min-width:580px;max-width:760px;margin:0 auto;height:auto}
 .dg .ar{fill:none;stroke:var(--muted);stroke-width:2}
 .dg .mk{fill:var(--muted)}
-.dg .bx{fill:none;stroke:var(--c);stroke-width:2;stroke-dasharray:2 5;stroke-linecap:round}
+.dg .bx{fill:color-mix(in srgb,var(--c) 6%,transparent);stroke:var(--c);stroke-width:1.5}
 .dg .bl{fill:var(--c);font:600 12px var(--sans);letter-spacing:.08em;text-anchor:end}
-.dg .lp{fill:none;stroke:var(--muted);stroke-width:2;stroke-dasharray:7 5}
+.dg .lp{fill:none;stroke:var(--muted);stroke-width:1.5}
 .dg .lpl{fill:var(--muted);font:600 11px var(--sans);letter-spacing:.06em;text-anchor:end}
-.dg .nd{cursor:pointer;outline:none}
+.dg .nd{outline:none}
 .dg .nd rect{fill:color-mix(in srgb,var(--c) 12%,var(--surface));stroke:var(--c);stroke-width:1.5}
 .dg .nd circle{fill:var(--c)}
 .dg .nn{fill:var(--surface);font:600 12px var(--mono);text-anchor:middle}
 .dg .nl{fill:var(--ink);font:500 12.5px var(--sans)}
-.dg .nd:hover rect,.dg .nd:focus-visible rect{stroke-width:3.5}
 .dg .al{fill:var(--muted);font:12px var(--sans)}
 .chk{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
 .cr{display:grid;grid-template-columns:30px minmax(0,1.4fr) minmax(0,1.6fr) auto;gap:10px;align-items:center;padding:7px 12px;border-top:1px solid var(--line)}
@@ -269,6 +268,23 @@ pre{margin:6px 0 0;padding:10px 12px;background:var(--soft);border-radius:8px;ov
 .gc.on{background:var(--c);color:var(--surface);border-color:var(--c)}
 .v1 .pc+.pc{margin-top:0}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.dn{text-align:center;font-size:20px;line-height:1;color:var(--muted);margin:4px 0}
+.chn{font-size:12px;color:var(--text2);margin:6px 0 0 14px}
+.chn{font-size:12.5px;color:var(--text2);margin:8px 0 0 2px}
+.v1.tpr{display:flex;flex-direction:row;gap:10px;align-items:flex-start}.tpr .tp{flex:1;min-width:0}.tpr .seg{flex-direction:column;align-items:stretch;flex:none}.tpr .sb{text-align:left}@media(max-width:560px){.v1.tpr{flex-direction:column}.tpr .seg{flex-direction:row}}
+.tok.q{background:color-mix(in srgb,var(--c) 16%,transparent);border-color:var(--c)}.tok.q i{color:var(--c)}.idl mark{background:color-mix(in srgb,var(--c) 18%,transparent);color:inherit;border-radius:3px;padding:0 2px}.cnt{margin-left:8px;font-size:11.5px;color:var(--muted)}
+
+.prep{gap:12px}.prep .pr{display:grid;grid-template-columns:86px 1fr;gap:10px;align-items:center}.prep .pr>b{font-size:12.5px;color:var(--muted);font-weight:600}
+.prep small{font-size:11.5px;color:var(--muted);display:block;font-weight:400}
+.gm{display:flex;height:74px;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--soft)}
+.gm span{display:flex;flex-direction:column;justify-content:center;padding:0 10px;font-size:12.5px;font-weight:600}
+.gm .w{flex:5;background:color-mix(in srgb,var(--c) 28%,transparent)}.gm .k{flex:4;border-left:1px dashed var(--c);border-right:1px dashed var(--c)}.gm .f{flex:1.4;color:var(--muted);font-weight:400}
+.gm em,.rd em{display:flex;flex-wrap:wrap;gap:2px;font-style:normal;margin-top:3px}
+.gm i,.rd i{width:7px;height:7px;border-radius:2px;display:inline-block}
+.kce{border:1px dashed var(--muted)}.kcf{background:var(--c)}
+.bt{display:flex;gap:6px;align-items:center;flex-wrap:wrap;border:1px solid var(--c);border-radius:10px;padding:6px 8px}
+.bt span{border:1px solid var(--line);background:var(--soft);border-radius:6px;padding:2px 10px;font-size:12.5px}.bt .me{background:var(--c);color:var(--surface);border-color:var(--c);font-weight:600}.bt small{margin-left:auto}
+.rd{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.rd em{max-width:300px}
 </style>
 <script id="portfolio-theme-sync">
 (function(){
@@ -323,22 +339,21 @@ function probsHTML(){
 function passBand(){return '<div class="note">Showing pass '+(S.pass+1)+' of 3. Change the pass in the dashed loop header above.</div>'}
 
 var STEPS=[
-{o:"client",t:"You send the prompt",s:"Your app packs the text into a request",b:function(){return step1Visual()+'<details class="more"><summary>What and why</summary><ul class="kw"><li><b>What</b> text → HTTP request</li><li><b>Where</b> localhost:11434 (Ollama) · company API (cloud)</li><li><b>Why</b> one fixed format · any app talks to any server</li></ul></details>'}},
-{o:"server",t:"Check the request",s:"Is it valid, allowed, and within limits?",b:function(){return step2Visual()+'<details class="more"><summary>What and why</summary><ul class="kw"><li><b>What</b> 5 checks, in order</li><li><b>Fail</b> first failure stops it · error returned</li><li><b>Errors</b> 400 bad request · 401 bad key · 404 no model · 429 rate limit</li><li><b>Why</b> no GPU time wasted on abuse or bad input</li></ul></details>'}},
-{o:"server",t:"Queue the request",s:"Wait for a free slot",b:function(){return step3Visual()+'<details class="more"><summary>What and why</summary><ul class="kw"><li><b>What</b> limited slots · extra requests wait</li><li><b>Order</b> first in, first out</li><li><b>Why</b> avoids GPU memory overload · enables batching (step 6)</li><li><b>Too long</b> 503 server busy</li></ul></details>'}},
-{o:"server",t:"Apply the chat template",s:"Wrap the text in speaker markers",b:function(){
-  return '<div class="v1">'+seg("tpl",["ChatML","Llama 3","Gemma"],S.tpl)+'<pre class="tp">'+tplHTML(TPL[S.tpl].t)+'</pre></div>'+
-  kw([["What","system + user messages → one text with speaker markers"],["Cue","empty last turn = write the reply here"],["Varies","each model family has its own markers (Gemma has no system role)"],["Why","the model was trained on exactly this format"],["Where","server or runtime, depends on the tool"]])}},
-{o:"server",t:"Tokenize the text",s:"Text becomes a list of token IDs",b:function(){
-  var all=S.tokfull===1,arr=all?TOK:TOK.slice(14,21);
-  return '<div class="v1">'+seg("tokfull",["Question only (7 tokens)","Full template (26 tokens)"],S.tokfull)+tokChips(arr)+
-  '<div class="mono">['+arr.map(function(t){return t[1]}).join(", ")+']</div></div>'+
-  kw([["What","text → token IDs, one number per piece"],["Vocab","about 100,000 pieces in a fixed dictionary"],["Why","models read numbers only · rare words split into known pieces · same text, same IDs"],["Note","IDs here are made up · a real tokenizer may split Bangladesh in two"]])}},
-{o:"runtime",t:"Runtime prepares the run",s:"Weights are loaded, requests are batched",b:function(){
-  function node(k,t,sub){return '<div class="fn"><span class="num">'+k+'</span><div><h4>'+t+'</h4><p style="margin:0">'+sub+'</p></div></div>'}
-  var A='<div class="fa" aria-hidden="true">↓</div>';
-  return '<div class="fl">'+node(1,"Weights in GPU memory","the model file was loaded once, at startup")+A+node(2,"Batch","your request runs together with other waiting requests")+A+node(3,"Empty KV cache","space to remember earlier tokens, so later passes do not redo them")+A+node(4,"Ready","26 prompt tokens go into the token loop below")+'</div>'+
-  kw([["Pass","one run through steps 7 to 11 = one new token"],["Pass 1","reads the whole prompt, fills the KV cache"],["Next passes","add 1 token, compute only that one"],["Weights","model file loaded into GPU memory once, at startup"],["Batching","waiting requests run together"],["Why","speed and cost"]])}},
+{o:"client",t:"Send prompt",s:"",b:function(){return step1Visual()+'<details class="more"><summary>What and why</summary><ul class="kw"><li><b>What</b> text → HTTP request</li><li><b>Where</b> localhost:11434 (Ollama) · company API (cloud)</li><li><b>Why</b> one fixed format · any app talks to any server</li></ul></details>'}},
+{o:"server",t:"Check request",s:"",b:function(){return step2Visual()}},
+{o:"server",t:"Queue",s:"",b:function(){return step3Visual()}},
+{o:"server",t:"Chat template",s:"",b:function(){
+  return '<div class="v1 tpr"><pre class="tp">'+tplHTML(TPL[S.tpl].t)+'</pre>'+seg("tpl",["ChatML","Llama 3","Gemma"],S.tpl)+'</div>'}},
+{o:"server",t:"Tokenize",s:"",b:function(){
+  var h=[14,20];
+  return '<div class="v1">'+tokChips(TOK,undefined,h)+'<div class="mono idl">['+TOK.map(function(t,i){return i>=h[0]&&i<=h[1]?'<mark>'+t[1]+'</mark>':t[1]}).join(", ")+']<span class="cnt">26</span></div><div class="dn" aria-hidden="true">↓</div></div>'}},
+{o:"runtime",t:"Prepare run",s:"",b:function(){
+  var cells=function(c){return Array(27).join('<i class="'+c+'"></i>')};
+  return '<div class="v1 prep">'+
+   '<div class="pr"><b>GPU memory</b><div class="gm"><span class="w">Weights<small>loaded at startup</small></span><span class="k">KV cache<small>empty</small><em>'+cells("kce")+'</em></span><span class="f">free</span></div></div>'+
+   '<div class="pr"><b>Batch</b><div class="bt"><span class="me">Your prompt</span><span>Request B</span><span>Request C</span><small>run together</small></div></div>'+
+   '<div class="pr"><b>Ready</b><div class="rd"><em>'+cells("kcf")+'</em><small>26 prompt tokens</small></div></div>'+
+  '</div>'}},
 {o:"model",t:"Embedding",s:"Each token ID becomes a vector of numbers",g:"loop",b:function(){
   if(S.pass>0){
     var nt=PASS[S.pass-1].cands[pickOf(S.pass-1)][0],nid=tid(nt),nn=nt.trim();
@@ -457,6 +472,7 @@ function step1Visual(){
       win('Script','<pre class="wb code">answer = ask("'+P+'")</pre>')+
       win('Terminal','<pre class="wb code">$ ollama run example-model "'+P+'"</pre>')+
     '</div>'+
+    '<div class="dn" aria-hidden="true">↓</div>'+
     '<div class="stg">2. Your app builds the HTTP request from it</div>'+
     '<div class="dt"><div class="dtt"><span class="on">Headers</span><span>Payload</span><span>Preview</span><span>Response</span></div>'+
       '<div class="dts"><div class="kv"><b>Request URL</b><span>http://localhost:11434/v1/chat/completions</span></div>'+
@@ -464,35 +480,34 @@ function step1Visual(){
         '<div class="kv"><b>Content-Type</b><span>application/json '+c('the body is JSON')+'</span></div></div>'+
       '<div class="dts"><h5>▼ Request Payload</h5>'+payload+'</div>'+
     '</div>'+
-    '<div class="srv">3. Sent over the network to the inference server (next step)</div>'+
   '</div>';
 }
 var SHORT=["Send prompt","Check request","Queue","Chat template","Tokenize","Prepare run","Embedding","Transformer","Logits","Sampling","Stop check","Stream out","Show answer"];
 function nd(i,x,y,w){
   var st=STEPS[i];
-  return '<g class="nd" data-go="'+i+'" tabindex="0" role="button" aria-label="Step '+(i+1)+': '+SHORT[i]+'" style="--c:var('+OWN[st.o].c+')"><rect x="'+x+'" y="'+y+'" width="'+w+'" height="40" rx="8"/><circle cx="'+(x+17)+'" cy="'+(y+20)+'" r="11"/><text class="nn" x="'+(x+17)+'" y="'+(y+20)+'" dominant-baseline="central">'+(i+1)+'</text><text class="nl" x="'+(x+34)+'" y="'+(y+20)+'" dominant-baseline="central">'+SHORT[i]+'</text></g>';
+  return '<g class="nd" style="--c:var('+OWN[st.o].c+')"><rect x="'+x+'" y="'+y+'" width="'+w+'" height="30" rx="7"/><circle cx="'+(x+16)+'" cy="'+(y+15)+'" r="9.5"/><text class="nn" x="'+(x+16)+'" y="'+(y+15)+'" dominant-baseline="central">'+(i+1)+'</text><text class="nl" x="'+(x+32)+'" y="'+(y+15)+'" dominant-baseline="central">'+SHORT[i]+'</text></g>';
 }
 function ar(d){return '<path class="ar" d="'+d+'" marker-end="url(#ah)"/>'}
 function bx(o,x,y,w,h,label,lx,ly){
   return '<rect class="bx" style="--c:var('+OWN[o].c+')" x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="14"/><text class="bl" style="--c:var('+OWN[o].c+')" x="'+lx+'" y="'+ly+'">'+label+'</text>';
 }
 function overview(){
-  var g='';
-  g+=bx("client",40,8,600,70,"YOUR APP",624,26);
-  g+=bx("server",40,86,600,504,"INFERENCE SERVER",624,104);
-  g+=bx("runtime",60,186,560,316,"INFERENCE RUNTIME",604,204);
-  g+='<rect class="lp" x="80" y="286" width="520" height="190" rx="12"/><text class="lpl" x="584" y="304">TOKEN LOOP: REPEATS FOR EVERY TOKEN</text>';
-  g+=bx("model",100,316,480,86,"MODEL",564,332);
-  g+=bx("client",40,620,600,70,"YOUR APP",624,638);
-  g+=ar("M123 74 V116")+ar("M186 138 H204")+ar("M332 138 H350")+ar("M478 138 H496");
-  g+=ar("M561 158 V172 H189 V214");
-  g+=ar("M189 256 V346")+ar("M254 368 H272")+ar("M404 368 H422")+ar("M489 388 V418")+ar("M424 440 H256")+ar("M189 420 V390");
-  g+=ar("M189 460 V528")+ar("M189 570 V638");
-  g+='<text class="al" x="134" y="100">request goes in</text><text class="al" x="340" y="430" text-anchor="middle">not done yet</text><text class="al" x="200" y="494">end token: stop</text><text class="al" x="200" y="610">answer streams back</text>';
-  g+=nd(0,60,34,126)+nd(1,60,118,126)+nd(2,206,118,126)+nd(3,352,118,126)+nd(4,498,118,126);
-  g+=nd(5,124,216,130)+nd(6,124,348,130)+nd(7,274,348,130)+nd(8,424,348,130)+nd(9,424,420,130)+nd(10,124,420,130);
-  g+=nd(11,124,530,130)+nd(12,124,640,130);
-  return '<div class="ov"><h3>Bird\'s-eye view of the whole system</h3><p class="sub">Follow the arrows from top to bottom. Click any numbered step to jump to its details.</p><div class="dgw"><svg class="dg" viewBox="0 0 680 710" role="img" aria-label="Diagram of the whole system: your app sends a request into the inference server, which contains the inference runtime, which contains the model; the answer streams back to your app"><defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk" d="M1 1L9 5L1 9z"/></marker></defs>'+g+'</svg></div></div>';
+  var g='<g transform="translate(20,0)">';
+  g+=bx("client",40,8,600,50,"YOUR APP",624,28);
+  g+=bx("server",40,64,600,438,"INFERENCE SERVER",624,84);
+  g+=bx("runtime",58,158,564,260,"INFERENCE RUNTIME",606,178);
+  g+='<rect class="lp" x="78" y="236" width="524" height="166" rx="12"/><text class="lpl" x="586" y="256">TOKEN LOOP: REPEATS FOR EVERY TOKEN</text>';
+  g+=bx("model",98,262,484,76,"MODEL",566,280);
+  g+=bx("client",40,520,600,50,"YOUR APP",624,540);
+  g+=ar("M123 50 V96")+ar("M186 111 H204")+ar("M332 111 H350")+ar("M478 111 H496");
+  g+=ar("M561 126 V142 H189 V188");
+  g+=ar("M189 220 V292")+ar("M254 309 H272")+ar("M404 309 H422")+ar("M489 324 V356")+ar("M424 373 H256")+ar("M189 358 V326");
+  g+=ar("M189 388 V446")+ar("M189 478 V532");
+  g+='<text class="al" x="134" y="82">send prompt</text><text class="al" x="340" y="364" text-anchor="middle">not done yet</text><text class="al" x="200" y="438">end token: stop</text><text class="al" x="200" y="514">answer streams back</text>';
+  g+=nd(0,60,20,126)+nd(1,60,96,126)+nd(2,206,96,126)+nd(3,352,96,126)+nd(4,498,96,126);
+  g+=nd(5,124,190,130)+nd(6,124,294,130)+nd(7,274,294,130)+nd(8,424,294,130)+nd(9,424,358,130)+nd(10,124,358,130);
+  g+=nd(11,124,448,130)+nd(12,124,532,130)+'</g>';
+  return '<div class="ov"><h3>System</h3><div class="dgw"><svg class="dg" viewBox="0 0 720 580" role="img" aria-label="Diagram of the whole system: your app sends a request into the inference server, which contains the inference runtime, which contains the model; the answer streams back to your app"><defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk" d="M1 1L9 5L1 9z"/></marker></defs>'+g+'</svg></div></div>';
 }
 var CHK=[
  {n:"Format",ok:'valid JSON · "model", "messages"',bad:'"messages" missing',code:"400 Bad Request",msg:"Invalid request: messages is required",type:"invalid_request_error"},
@@ -510,8 +525,8 @@ function chkRow(i){
 }
 function chkHTML(){var h="";for(var i=0;i<CHK.length;i++)h+=chkRow(i);return h}
 function chkBar(){
-  if(S.cf<0)return '<b>All passed</b> request moves on to the queue (next step)';
-  return '<b>Failed: '+CHK[S.cf].n+'</b> error returned · model never used';
+  if(S.cf<0)return '<b>All passed</b>';
+  return '<b>Failed: '+CHK[S.cf].n+'</b>';
 }
 function chkBtns(){return '<button class="btn primary" id="cfail">'+(S.cf<0?'Simulate failure':'Next failure')+'</button><button class="btn" id="creset" aria-label="Reset">↺ Reset</button>'}
 function chkErr(){
@@ -520,7 +535,16 @@ function chkErr(){
   return '<div class="dt"><div class="dts"><div class="kv"><b>Status Code</b><span class="st2">● '+c.code+'</span></div><pre>{ <span class="jk">"error"</span>: { <span class="jk">"message"</span>: <span class="js">"'+c.msg+'"</span>, <span class="jk">"type"</span>: <span class="js">"'+c.type+'"</span> } }</pre></div></div>';
 }
 function step2Visual(){
-  return '<div class="v1"><div class="chk" id="cv">'+chkHTML()+'</div><div class="qbar '+(S.cf<0?'go':'bad')+'" id="cbar"><span class="qst" id="cs">'+chkBar()+'</span><span class="qbt" id="cb">'+chkBtns()+'</span></div><div id="ce">'+chkErr()+'</div></div>';
+  var c=function(t){return '<span class="cm">// '+t+'</span>'};
+  var ok=function(t){return c('✓ '+t)};
+  var pre='<pre>'+
+'<span class="jk">POST</span> /v1/chat/completions   '+ok('valid JSON')+'\n'+
+'{ <span class="jk">"model"</span>: <span class="js">"example-model"</span>,   '+ok('model found')+'\n'+
+'  <span class="jk">"messages"</span>: [ ... ],   '+ok('has messages')+'\n'+
+'  <span class="jk">"max_tokens"</span>: <span class="jn">256</span> }   '+ok('256 ≤ 4096 limit')+'\n\n'+
+'<span class="jk">Authorization</span>: none   '+c('– API key: cloud only, skipped')+'\n'+
+'<span class="jk">Requests this minute</span>: <span class="jn">12</span>   '+ok('under the 60 limit')+'</pre>';
+  return '<div class="v1"><div class="dt"><div class="dts">'+pre+'</div></div></div>';
 }
 function cRefresh(){
   var a=document.getElementById("cv");if(!a)return;
@@ -546,18 +570,22 @@ function queueBtns(){
   return '<button class="btn primary" id="qnext"'+(S.qt?' disabled':'')+'>Free a slot</button><button class="btn" id="qreset" aria-label="Start over">↺ Reset</button>';
 }
 function step3Visual(){
-  return '<div class="v1"><div id="qv">'+queueHTML()+'</div><div class="qbar '+qState()+'" id="qbar"><span class="qst" id="qs">'+slotHTML()+'</span><span class="qbt" id="qb">'+queueBtns()+'</span></div></div>';
+  return '<div class="v1"><div id="qv">'+queueHTML()+'</div><div class="chn">'+['Request A and B have left: your prompt is at the front','Request A has left: your prompt moves up','All slots busy: your prompt waits'][S.qa]+'</div></div>';
 }
 function qRefresh(){var a=document.getElementById("qv");if(a){a.innerHTML=queueHTML();document.getElementById("qs").innerHTML=slotHTML();document.getElementById("qb").innerHTML=queueBtns();document.getElementById("qbar").className="qbar "+qState()}}
 function seg(key,labels,cur){return '<span class="seg">'+labels.map(function(l,i){return '<button class="sb" data-seg="'+key+'" data-v="'+i+'" aria-pressed="'+(cur===i)+'">'+l+'</button>'}).join('')+'</span>'}
-function passSeg(){return '<span class="pl">Pass '+(S.pass+1)+'</span>'}
+function passSeg(){return '<span class="cpl">Pass '+(S.pass+1)+'</span>'}
 function endPass(){for(var i=0;i<3;i++){if(PASS[i].cands[pickOf(i)][0]==="<|im_end|>")return i}return 2}
 function nav(d){
+  if(d>0&&S.open===2&&S.qa>0){S.qa--;S.drawn=null;paint();return}
+  if(d<0&&S.open===2&&S.qa<2){S.qa++;S.drawn=null;paint();return}
+  if(d>0&&S.open===1)S.qa=2;
+  if(d<0&&S.open===3)S.qa=0;
   if(d>0){if(S.open===10&&S.pass<endPass()){S.pass++;S.open=6}else S.open=Math.min(S.open+1,STEPS.length-1)}
   else{if(S.open===6&&S.pass>0){S.pass--;S.open=10}else{if(S.open===11)S.pass=endPass();S.open=Math.max(S.open-1,0)}}
   S.drawn=null;go(S.open,true)}
 function kw(rows){return '<details class="more"><summary>What and why</summary><ul class="kw">'+rows.map(function(r){return '<li><b>'+r[0]+'</b> '+r[1]+'</li>'}).join('')+'</ul></details>'}
-function tokChips(arr,newFrom){return '<div class="strip">'+arr.map(function(t,i){return '<span class="tok'+(t[2]?' s':'')+(newFrom!==undefined&&i>=newFrom?' n':'')+'">'+esc(t[0])+'<i>'+t[1]+'</i></span>'}).join('')+'</div>'}
+function tokChips(arr,newFrom,hl){return '<div class="strip">'+arr.map(function(t,i){return '<span class="tok'+(t[2]?' s':'')+(newFrom!==undefined&&i>=newFrom?' n':'')+(hl&&i>=hl[0]&&i<=hl[1]?' q':'')+'">'+esc(t[0])+'<i>'+t[1]+'</i></span>'}).join('')+'</div>'}
 function bar(html,cls,btns){return '<div class="qbar '+cls+'"><span class="qst">'+html+'</span><span class="qbt">'+(btns||'')+'</span></div>'}
 var TPL=[
  {t:"<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\nWhat is the capital of Bangladesh?<|im_end|>\n<|im_start|>assistant\n"},
@@ -650,7 +678,7 @@ var root=document.getElementById("steps");
 var NOTE={client:"",server:"contains the runtime, which contains the model",runtime:"part of the server, runs the model on the hardware",model:"loaded inside the runtime"};
 function stepHTML(i){
   var st=STEPS[i];
-  return '<section class="step" id="st'+i+'" style="--c:var('+OWN[st.o].c+')" data-o="'+st.o+'"><div class="sh" data-i="'+i+'"><span class="num">'+(i+1)+'</span><span><span class="st">'+st.t+'</span><span class="ss">'+st.s+'</span></span></div><div class="body" id="b'+i+'"></div></section>';
+  return '<section class="step" id="st'+i+'" style="--c:var('+OWN[st.o].c+')" data-o="'+st.o+'"><div class="sh" data-i="'+i+'"><span class="num">'+(i+1)+'</span><span><span class="st">'+st.t+'</span>'+(st.s?'<span class="ss">'+st.s+'</span>':'')+'</span></div><div class="body" id="b'+i+'"></div></section>'+(i==0?'<div class="dn" aria-hidden="true">↓</div>':'');
 }
 function steps(a,b){var h="";for(var i=a;i<=b;i++)h+=stepHTML(i);return h}
 function box(o,inner){
@@ -682,7 +710,7 @@ function paint(){
   STEPS.forEach(function(st,i){
     var el=document.getElementById("st"+i),btn=el.querySelector(".sh"),body=document.getElementById("b"+i);
     el.classList.toggle("open",S.open===i);
-    var html=st.b(),cx=CALC[i]?CALC[i]():"";
+    var html=st.b(),cx=(i>5||i===0)&&CALC[i]?CALC[i]():"";
     if(cx){cx='<div class="calc"><b>Calculation</b>'+cx+'</div>';var k=html.lastIndexOf('<details class="more">');html=k>=0?html.slice(0,k)+cx+html.slice(k):html+cx}
     body.innerHTML=html;
   });
@@ -690,7 +718,7 @@ function paint(){
   document.getElementById("next").textContent=(S.open===10&&S.pass<endPass())?"Back to step 7":"Next step";
   
   document.querySelectorAll("[data-pass]").forEach(function(b){b.setAttribute("aria-pressed",String(+b.dataset.pass===S.pass))});
-  var ep=endPass(),tot=6+(ep+1)*5+2,i=S.open,pos=i<6?i+1:(i<=10?6+S.pass*5+(i-5):6+(ep+1)*5+(i-10));
+  var ep=endPass(),tot=6+(ep+1)*5+2+2,i=S.open,pos=i<6?i+1:(i<=10?6+S.pass*5+(i-5):6+(ep+1)*5+(i-10));pos+=i>2?2:(i===2?2-S.qa:0);
   document.getElementById("count").innerHTML="Step "+pos+" of "+tot+(i>=6&&i<=10?' <small style="color:var(--muted)">(card '+(i+1)+', pass '+(S.pass+1)+')</small>':'');
   document.getElementById("prev").disabled=S.open===0;
   document.getElementById("next").disabled=S.open===STEPS.length-1;
